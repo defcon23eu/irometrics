@@ -1,116 +1,197 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react'
+import { useReducedMotion } from 'framer-motion'
 
-interface IROGaugeProps {
-  value: number;
-  maxValue?: number;
+type Regime = 'laminar' | 'transicion' | 'turbulencia_incipiente' | 'turbulencia_severa'
+
+interface IROResultGaugeProps {
+  reOrg: number
+  regime: Regime
+  animate?: boolean
 }
 
-// Gauge arc zones (angle in degrees, from -90 to 90)
-const ZONES = [
-  { threshold: 100, color: 'var(--color-regime-laminar)' },
-  { threshold: 800, color: 'var(--color-regime-transicion)' },
-  { threshold: 1200, color: 'var(--color-regime-incipiente)' },
-  { threshold: 2000, color: 'var(--color-regime-severo)' },
-];
-
-function valueToAngle(value: number, max: number): number {
-  const clamped = Math.min(Math.max(value, 0), max);
-  return -90 + (clamped / max) * 180;
+// Regime colors
+const REGIME_COLORS: Record<Regime, string> = {
+  laminar: '#22C55E',
+  transicion: '#EAB308',
+  turbulencia_incipiente: '#F97316',
+  turbulencia_severa: '#EF4444',
 }
 
-export default function IROGauge({ value, maxValue = 2000 }: IROGaugeProps) {
-  const [animatedAngle, setAnimatedAngle] = useState(-90);
-  const targetAngle = valueToAngle(value, maxValue);
+// Map reOrg to needle angle on the semicircle (−90° → +90°) using log scale
+function reOrgToAngle(reOrg: number): number {
+  const maxLog = Math.log10(2001)
+  const valLog = Math.log10(Math.min(reOrg, 2000) + 1)
+  return -90 + Math.min(valLog / maxLog, 1) * 180
+}
+
+// Arc helper
+function describeArc(
+  cx: number,
+  cy: number,
+  r: number,
+  startDeg: number,
+  endDeg: number,
+): string {
+  const rad = (d: number) => (d * Math.PI) / 180
+  const x1 = cx + r * Math.cos(rad(startDeg))
+  const y1 = cy + r * Math.sin(rad(startDeg))
+  const x2 = cx + r * Math.cos(rad(endDeg))
+  const y2 = cy + r * Math.sin(rad(endDeg))
+  const large = endDeg - startDeg > 180 ? 1 : 0
+  return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}`
+}
+
+// Log-scale arc segment boundaries
+// log10(101)/log10(2001)*180 ≈ 37.4 (laminar 0–100)
+// (log10(801)−log10(101))/log10(2001)*180 ≈ 53.0 (transición 100–800)
+// (log10(1201)−log10(801))/log10(2001)*180 ≈ 17.4 (incipiente 800–1200)
+// remainder ≈ 72.2 (severo 1200+)
+const ARC_SEGMENTS: { color: string; start: number; end: number }[] = [
+  { color: '#22C55E', start: -90, end: -52.6 },
+  { color: '#EAB308', start: -52.6, end: 0.4 },
+  { color: '#F97316', start: 0.4, end: 17.8 },
+  { color: '#EF4444', start: 17.8, end: 90 },
+]
+
+/**
+ * IROResultGauge
+ * Enhanced SVG semicircle gauge with 4 log-scale regime arcs and animated needle.
+ * Supports reduced motion preference.
+ */
+export default function IROResultGauge({
+  reOrg,
+  regime,
+  animate = true,
+}: IROResultGaugeProps) {
+  const reduced = useReducedMotion()
+  const shouldAnimate = animate && !reduced
+  const targetAngle = reOrgToAngle(reOrg)
+  const [needleAngle, setNeedleAngle] = useState(shouldAnimate ? -90 : targetAngle)
+  const needleColor = REGIME_COLORS[regime]
 
   useEffect(() => {
-    // Small delay then animate
-    const timer = setTimeout(() => setAnimatedAngle(targetAngle), 200);
-    return () => clearTimeout(timer);
-  }, [targetAngle]);
+    if (!shouldAnimate) {
+      setNeedleAngle(targetAngle)
+      return
+    }
+    const duration = 1800
+    const start = performance.now()
+    const from = -90
+    let raf: number
+    function frame(now: number) {
+      const t = Math.min((now - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - t, 3) // ease-out cubic
+      setNeedleAngle(from + eased * (targetAngle - from))
+      if (t < 1) raf = requestAnimationFrame(frame)
+    }
+    raf = requestAnimationFrame(frame)
+    return () => cancelAnimationFrame(raf)
+  }, [targetAngle, shouldAnimate])
 
-  const cx = 150;
-  const cy = 150;
-  const r = 120;
-
-  // Create arc paths for each zone
-  function arcPath(startAngleDeg: number, endAngleDeg: number): string {
-    const startRad = (startAngleDeg * Math.PI) / 180;
-    const endRad = (endAngleDeg * Math.PI) / 180;
-    const x1 = cx + r * Math.cos(startRad);
-    const y1 = cy + r * Math.sin(startRad);
-    const x2 = cx + r * Math.cos(endRad);
-    const y2 = cy + r * Math.sin(endRad);
-    const largeArc = endAngleDeg - startAngleDeg > 180 ? 1 : 0;
-    return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`;
-  }
-
-  // Zone angle boundaries
-  const zoneAngles = ZONES.map((z) => ({
-    angle: -90 + (Math.min(z.threshold, maxValue) / maxValue) * 180,
-    color: z.color,
-  }));
-
-  // Needle endpoint
-  const needleRad = (animatedAngle * Math.PI) / 180;
-  const needleLen = r - 15;
-  const nx = cx + needleLen * Math.cos(needleRad);
-  const ny = cy + needleLen * Math.sin(needleRad);
+  const cx = 140
+  const cy = 140
+  const r = 100
+  const rad = (d: number) => (d * Math.PI) / 180
+  const needleLen = 82
+  const nx = cx + needleLen * Math.cos(rad(needleAngle))
+  const ny = cy + needleLen * Math.sin(rad(needleAngle))
 
   return (
-    <div className="flex flex-col items-center">
-      <svg viewBox="0 0 300 180" className="w-full max-w-[350px]">
-        {/* Arc zones */}
-        {zoneAngles.map((zone, i) => {
-          const start = i === 0 ? -180 : zoneAngles[i - 1].angle - 90;
-          const end = zone.angle - 90;
-          // Shift angles for SVG coordinate system (top of arc = -180 to 0)
-          const s = -180 + (i === 0 ? 0 : (zoneAngles[i - 1].angle + 90) / 180 * 180);
-          const e = -180 + ((zone.angle + 90) / 180) * 180;
-          return (
-            <path
-              key={i}
-              d={arcPath(
-                -180 + ((i === 0 ? 0 : zoneAngles[i - 1].angle + 90) / 180) * 180,
-                -180 + ((zone.angle + 90) / 180) * 180,
-              )}
-              fill="none"
-              stroke={zone.color}
-              strokeWidth="18"
-              strokeLinecap="round"
-              opacity={0.7}
-            />
-          );
-        })}
+    <svg
+      viewBox="0 0 280 160"
+      width="100%"
+      style={{ maxWidth: 340 }}
+      role="img"
+      aria-label={`Medidor IRO: ${reOrg.toFixed(1)} — ${regime.replace('_', ' ')}`}
+    >
+      {/* Background track */}
+      <path
+        d={describeArc(cx, cy, r, -90, 90)}
+        fill="none"
+        stroke="#1F1F23"
+        strokeWidth={18}
+        strokeLinecap="round"
+      />
 
-        {/* Needle */}
-        <motion.line
-          x1={cx}
-          y1={cy}
-          animate={{ x2: nx, y2: ny }}
-          transition={{ duration: 1.5, ease: 'easeOut' }}
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          x2={cx}
-          y2={cy - needleLen}
+      {/* Colored regime segments */}
+      {ARC_SEGMENTS.map((seg, i) => (
+        <path
+          key={i}
+          d={describeArc(cx, cy, r, seg.start, seg.end)}
+          fill="none"
+          stroke={seg.color}
+          strokeWidth={18}
+          strokeLinecap={i === 0 || i === ARC_SEGMENTS.length - 1 ? 'round' : 'butt'}
+          opacity={0.9}
         />
+      ))}
 
-        {/* Center dot */}
-        <circle cx={cx} cy={cy} r="6" fill="currentColor" />
-      </svg>
+      {/* Needle glow (subtle) */}
+      <line
+        x1={cx}
+        y1={cy}
+        x2={nx}
+        y2={ny}
+        stroke={needleColor}
+        strokeWidth={6}
+        strokeLinecap="round"
+        opacity={0.25}
+      />
 
-      {/* Value */}
-      <motion.p
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="mt-2 text-4xl font-bold sm:text-5xl"
+      {/* Needle line */}
+      <line
+        x1={cx}
+        y1={cy}
+        x2={nx}
+        y2={ny}
+        stroke={needleColor}
+        strokeWidth={3}
+        strokeLinecap="round"
+      />
+
+      {/* Needle tip */}
+      <circle cx={nx} cy={ny} r={5} fill={needleColor} />
+
+      {/* Needle base */}
+      <circle cx={cx} cy={cy} r={6} fill="#3F3F46" />
+      <circle cx={cx} cy={cy} r={3} fill="#52525B" />
+
+      {/* Center value */}
+      <text
+        x={cx}
+        y={cy + 30}
+        textAnchor="middle"
+        fontFamily="var(--font-geist-mono), monospace"
+        fontSize="15"
+        fontWeight="700"
+        fill={needleColor}
       >
-        Re = {value.toFixed(2)}
-      </motion.p>
-    </div>
-  );
+        {reOrg.toFixed(1)}
+      </text>
+
+      {/* Arc labels */}
+      <text
+        x={30}
+        y={152}
+        textAnchor="middle"
+        fontFamily="var(--font-geist-sans), sans-serif"
+        fontSize="10"
+        fill="#52525B"
+      >
+        Laminar
+      </text>
+      <text
+        x={250}
+        y={152}
+        textAnchor="middle"
+        fontFamily="var(--font-geist-sans), sans-serif"
+        fontSize="10"
+        fill="#52525B"
+      >
+        Severo
+      </text>
+    </svg>
+  )
 }

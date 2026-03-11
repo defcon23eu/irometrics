@@ -1,22 +1,24 @@
-'use client';
+'use client'
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 
 interface LikertScale7Props {
-  value: number | null;
-  onChange: (value: number) => void;
-  leftLabel?: string;
-  rightLabel?: string;
-  disabled?: boolean;
+  value: number | null
+  onChange: (value: number) => void
+  leftLabel?: string
+  rightLabel?: string
+  disabled?: boolean
 }
 
-function CheckIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3.5 8 6.5 11 12.5 5" />
-    </svg>
-  );
-}
+const LABELS = [
+  'Nunca',
+  'Rara vez',
+  'A veces',
+  'Neutral',
+  'A menudo',
+  'Frecuentemente',
+  'Siempre',
+]
 
 export default function LikertScale7({
   value,
@@ -25,69 +27,113 @@ export default function LikertScale7({
   rightLabel = 'Totalmente de acuerdo',
   disabled = false,
 }: LikertScale7Props) {
+  const reduced = useReducedMotion()
+
   return (
-    <div className="flex flex-col items-center gap-4 w-full max-w-[640px] mx-auto">
+    <div className="flex flex-col items-center gap-5 w-full max-w-[640px] mx-auto">
+
       {/* Labels — top on desktop */}
-      <div className="hidden sm:flex w-full justify-between mb-1">
-        <span className="text-xs text-text-muted max-w-[140px]" id="likert7-left">{leftLabel}</span>
-        <span className="text-xs text-text-muted max-w-[140px] text-right" id="likert7-right">{rightLabel}</span>
+      <div className="hidden sm:flex w-full justify-between px-1">
+        <span className="text-xs text-text-muted max-w-[120px]" id="likert7-left">
+          {leftLabel}
+        </span>
+        <span className="text-xs text-text-muted max-w-[120px] text-right" id="likert7-right">
+          {rightLabel}
+        </span>
       </div>
 
-      {/* Buttons — vertical on mobile, horizontal on desktop */}
+      {/* Desktop: horizontal row */}
       <div
         role="radiogroup"
         aria-label="Escala de 1 a 7"
         aria-describedby="likert7-left likert7-right"
-        className="flex flex-col sm:flex-row w-full gap-2 sm:gap-2"
+        className="hidden sm:flex w-full gap-2 justify-center"
       >
         {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => {
-          const isSelected = value === n;
+          const isSelected = value === n
           return (
             <motion.button
               key={n}
               role="radio"
               aria-checked={isSelected}
-              aria-label={`Opción ${n} de 7`}
+              aria-label={`${n} - ${LABELS[n - 1]}`}
               disabled={disabled}
               onClick={() => onChange(n)}
-              whileTap={disabled ? undefined : { scale: 0.95 }}
-              whileHover={disabled ? undefined : { scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className={`relative flex items-center justify-center rounded-lg font-semibold
-                w-full h-14 sm:h-[52px] sm:flex-1
-                transition-all duration-150 ease-out
+              whileTap={disabled || reduced ? undefined : { scale: 0.92 }}
+              whileHover={disabled || reduced ? undefined : { scale: 1.08 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+              className={`
+                relative flex items-center justify-center rounded-full font-semibold
+                h-14 w-14 shrink-0 border-2 transition-all duration-150 ease-out
                 ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                 ${
                   isSelected
-                    ? 'bg-accent-glow border border-accent-primary text-text-accent shadow-glow'
-                    : 'bg-bg-surface border border-border-default text-text-secondary hover:bg-bg-elevated hover:border-accent-border'
+                    ? 'bg-accent-primary border-accent-primary text-white scale-105 shadow-[0_0_20px_rgba(99,102,241,0.4)]'
+                    : 'bg-bg-surface/60 border-border-subtle text-text-secondary hover:border-accent-primary/50 hover:bg-bg-elevated'
                 }
               `}
             >
-              <span className="text-lg">{n}</span>
+              <span className="text-lg tabular-nums">{n}</span>
               <AnimatePresence>
-                {isSelected && (
+                {isSelected && !reduced && (
                   <motion.span
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1.5 }}
                     exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute right-3 text-accent-primary"
-                  >
-                    <CheckIcon />
-                  </motion.span>
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    className="absolute inset-0 rounded-full border-2 border-accent-primary/50 pointer-events-none"
+                  />
                 )}
               </AnimatePresence>
             </motion.button>
-          );
+          )
         })}
       </div>
 
+      {/* Mobile: 2x4 grid (7 items + 1 empty) */}
+      <div
+        role="radiogroup"
+        aria-label="Escala de 1 a 7"
+        className="grid grid-cols-4 gap-3 w-full sm:hidden"
+      >
+        {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => {
+          const isSelected = value === n
+          return (
+            <motion.button
+              key={n}
+              role="radio"
+              aria-checked={isSelected}
+              aria-label={`${n} - ${LABELS[n - 1]}`}
+              disabled={disabled}
+              onClick={() => onChange(n)}
+              whileTap={disabled || reduced ? undefined : { scale: 0.92 }}
+              className={`
+                relative flex flex-col items-center justify-center rounded-2xl font-semibold
+                h-16 border-2 transition-all duration-150 ease-out
+                ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+                ${
+                  isSelected
+                    ? 'bg-accent-primary border-accent-primary text-white scale-[1.02] shadow-[0_0_16px_rgba(99,102,241,0.4)]'
+                    : 'bg-bg-surface/60 border-border-subtle text-text-secondary active:bg-bg-elevated'
+                }
+              `}
+            >
+              <span className="text-lg tabular-nums">{n}</span>
+              <span className={`text-[10px] mt-0.5 ${isSelected ? 'text-white/80' : 'text-text-muted'}`}>
+                {LABELS[n - 1]}
+              </span>
+            </motion.button>
+          )
+        })}
+        {/* Empty cell for 2x4 grid alignment */}
+        <div aria-hidden="true" />
+      </div>
+
       {/* Labels — bottom on mobile */}
-      <div className="flex sm:hidden w-full justify-between">
-        <span className="text-xs text-text-muted max-w-[120px]">{leftLabel}</span>
-        <span className="text-xs text-text-muted max-w-[120px] text-right">{rightLabel}</span>
+      <div className="flex sm:hidden w-full justify-between px-1">
+        <span className="text-xs text-text-muted max-w-[100px]">{leftLabel}</span>
+        <span className="text-xs text-text-muted max-w-[100px] text-right">{rightLabel}</span>
       </div>
     </div>
-  );
+  )
 }
