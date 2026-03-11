@@ -3,61 +3,44 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-// Inline SVG icon components
-function ChartIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 3v18h18" />
-      <path d="M7 16l4-8 4 4 4-8" />
-    </svg>
-  );
-}
-
-function GaugeIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
-    </svg>
-  );
-}
-
-function WaveIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0" />
-      <path d="M2 18c2-3 4-3 6 0s4 3 6 0 4-3 6 0" />
-      <path d="M2 6c2-3 4-3 6 0s4 3 6 0 4-3 6 0" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
-
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.15, duration: 0.6, ease: 'easeOut' as const },
+    transition: { delay: i * 0.1, duration: 0.5, ease: 'easeOut' as const },
   }),
 };
+
+const REGIMES = [
+  { icon: '◈', name: 'Laminar', range: 'Re < 100', color: 'var(--color-regime-laminar)', desc: 'Flujo estable y predecible. Baja fricción interna.' },
+  { icon: '⧫', name: 'Transición', range: '100 ≤ Re < 800', color: 'var(--color-regime-transicion)', desc: 'Señales de tensión emergente. Momento de intervenir.' },
+  { icon: '■', name: 'Turbulencia incipiente', range: '800 ≤ Re < 1200', color: 'var(--color-regime-incipiente)', desc: 'Inestabilidad visible. Riesgo de desgaste moderado-alto.' },
+  { icon: '▶', name: 'Turbulencia severa', range: 'Re ≥ 1200', color: 'var(--color-regime-severo)', desc: 'Dinámica caótica. Intervención prioritaria.' },
+];
+
+const STEPS = [
+  { n: '01', title: 'Contexto', desc: '5 preguntas sobre tu empresa, rol y antigüedad. Sin datos identificativos.' },
+  { n: '02', title: 'Diagnóstico', desc: '45 ítems: dinámica organizacional (IRO), desgaste profesional (MBI-GS), resistencia al cambio (Oreg RTC).' },
+  { n: '03', title: 'Resultado', desc: 'Re_org inmediato. Clasificación visual de régimen con desglose por subescala.' },
+];
+
+const INSTRUMENT = [
+  { bloque: 'A', instrumento: 'Sociodemográfico', items: '5', escala: '—' },
+  { bloque: 'B', instrumento: 'Protocolo IRO', items: '12', escala: 'Likert 1–7' },
+  { bloque: 'C', instrumento: 'MBI-GS (Gil-Monte, 2002)', items: '16', escala: '0–6' },
+  { bloque: 'D', instrumento: 'Oreg RTC (Oreg, 2003)', items: '17', escala: 'Likert 1–6' },
+];
 
 export default function HomePage() {
   return (
     <main className="min-h-screen">
-      {/* ===== BLOCK 1: Hero ===== */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, var(--color-bg-base) 0%, var(--color-bg-surface) 100%)' }}
+      {/* ===== HERO ===== */}
+      <section
+        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4"
+        style={{ background: 'linear-gradient(180deg, var(--color-bg-base) 0%, var(--color-bg-surface) 100%)' }}
       >
-        {/* CSS grid background */}
+        {/* Grid background */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -67,183 +50,237 @@ export default function HomePage() {
           }}
         />
         {/* Radial glow */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-accent-primary/8 blur-3xl" />
+        <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-primary/8 blur-3xl" />
 
         <motion.div
           className="relative z-10 max-w-3xl text-center"
           initial="hidden"
           animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
+          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
         >
           {/* Badge */}
           <motion.p
             variants={fadeUp}
             custom={0}
-            className="mb-6 inline-block rounded-full border border-border-default px-4 py-1.5 text-xs tracking-wide text-text-secondary"
+            className="mb-6 inline-block rounded-full border border-border-subtle bg-bg-surface/60 px-4 py-1.5 font-mono text-xs tracking-widest text-text-secondary"
           >
-            Investigación independiente · UNED · 2026
+            ✦ DIAGNÓSTICO · UNED PSICOLOGÍA · 2025–2026
           </motion.p>
 
           {/* Headline */}
           <motion.h1
             variants={fadeUp}
             custom={1}
-            className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl"
+            className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl"
           >
-            Mide la turbulencia de tu organización.
+            ¿En qué régimen opera tu organización?
           </motion.h1>
 
-          {/* Subheadline */}
+          {/* Equation */}
           <motion.p
             variants={fadeUp}
             custom={2}
-            className="mt-6 text-lg text-text-secondary sm:text-xl"
+            className="mt-6 font-mono text-lg text-accent-primary sm:text-xl"
           >
-            Diagnóstico avanzado de dinámica estructural y desgaste de equipos
-            para microempresas tecnológicas.
+            Re<sub>org</sub> = (δ · v · D) / μ
+          </motion.p>
+
+          {/* Stats */}
+          <motion.p
+            variants={fadeUp}
+            custom={3}
+            className="mt-4 font-mono text-sm text-text-muted"
+          >
+            08 min · 50 ítems · Re<sub>org</sub> inmediato
           </motion.p>
 
           {/* CTA */}
-          <motion.div variants={fadeUp} custom={3} className="mt-10">
+          <motion.div variants={fadeUp} custom={4} className="mt-10">
             <Link
               href="/consentimiento"
               className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
             >
-              → Iniciar diagnóstico gratuito
+              Iniciar diagnóstico →
             </Link>
           </motion.div>
 
-          {/* Trust line */}
+          {/* Trust */}
           <motion.p
             variants={fadeUp}
-            custom={4}
-            className="mt-4 text-sm text-text-muted"
+            custom={5}
+            className="mt-4 text-xs text-text-muted"
           >
-            5 minutos · 100 % anónimo · Sin registro
+            100 % anónimo · Sin registro · Sin cookies
           </motion.p>
         </motion.div>
       </section>
 
-      {/* ===== BLOCK 2: Authority metrics ===== */}
-      <section className="px-6 py-20">
-        <h2 className="sr-only">Indicadores clave del diagnóstico</h2>
-        <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-3">
-          {[
-            { icon: <ChartIcon />, title: '12 indicadores críticos', desc: 'Evaluación multidimensional de la dinámica interna' },
-            { icon: <GaugeIcon />, title: 'Régimen en tiempo real', desc: 'Resultado inmediato con clasificación visual' },
-            { icon: <WaveIcon />, title: 'Basado en física de fluidos', desc: 'Modelo analítico inspirado en dinámica de fluidos' },
-          ].map((card, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="rounded-xl border border-border-default bg-bg-surface p-6 text-center"
-            >
-              <div className="mb-3 flex justify-center text-text-accent">
-                {card.icon}
-              </div>
-              <h3 className="text-lg font-semibold">{card.title}</h3>
-              <p className="mt-2 text-sm text-text-secondary">{card.desc}</p>
-            </motion.div>
-          ))}
+      {/* ===== RÉGIMEN ===== */}
+      <section className="px-4 py-20">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
+            RÉGIMEN
+          </p>
+          <h2 className="mb-4 text-center text-2xl font-bold sm:text-3xl">
+            Cuatro estados de flujo organizacional
+          </h2>
+          <p className="mx-auto mb-12 max-w-xl text-center text-sm text-text-secondary">
+            El Índice de Reynolds Organizacional clasifica la dinámica de tu equipo en un espectro continuo — del orden al caos.
+          </p>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {REGIMES.map((r, i) => (
+              <motion.div
+                key={r.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ delay: i * 0.08, duration: 0.5 }}
+                className="rounded-xl border border-border-subtle bg-bg-surface p-5 transition-colors duration-150 hover:border-border-focus"
+                style={{ borderLeftWidth: '4px', borderLeftColor: r.color }}
+              >
+                <span className="font-mono text-2xl" style={{ color: r.color }}>{r.icon}</span>
+                <h3 className="mt-2 text-base font-semibold">{r.name}</h3>
+                <p className="mt-1 font-mono text-xs text-text-muted">{r.range}</p>
+                <p className="mt-2 text-sm text-text-secondary">{r.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Regime table */}
+          <div className="mt-8 overflow-x-auto rounded-xl border border-border-subtle bg-bg-surface">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-border-subtle text-xs uppercase tracking-wider text-text-muted">
+                  <th className="px-5 py-3 font-mono font-medium">Re<sub>org</sub></th>
+                  <th className="px-5 py-3 font-medium">Régimen</th>
+                  <th className="hidden px-5 py-3 font-medium sm:table-cell">Descripción</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-subtle">
+                {REGIMES.map((r) => (
+                  <tr key={r.name}>
+                    <td className="whitespace-nowrap px-5 py-3 font-mono text-text-secondary">{r.range}</td>
+                    <td className="px-5 py-3 font-semibold" style={{ color: r.color }}>
+                      <span className="mr-1.5">{r.icon}</span>{r.name}
+                    </td>
+                    <td className="hidden px-5 py-3 text-text-secondary sm:table-cell">{r.desc}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      {/* ===== BLOCK 3: How it works ===== */}
-      <section className="px-6 py-20 bg-bg-surface/50">
-        <div className="mx-auto max-w-3xl">
+      {/* ===== MÉTODO ===== */}
+      <section className="bg-bg-surface/50 px-4 py-20">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
+            MÉTODO
+          </p>
           <h2 className="mb-12 text-center text-2xl font-bold sm:text-3xl">
-            Cómo funciona
+            Tres pasos. Un diagnóstico.
           </h2>
-          <div className="grid gap-10 sm:grid-cols-3">
-            {[
-              { step: '01', title: 'Describe tu organización', desc: '5 preguntas contextuales sobre tu empresa y equipo' },
-              { step: '02', title: 'Evalúa la dinámica', desc: 'Indicadores de dinámica organizacional, bienestar y adaptación al cambio' },
-              { step: '03', title: 'Recibe tu régimen', desc: 'Resultado visual inmediato con tu nivel de turbulencia organizacional' },
-            ].map((item, i) => (
+
+          <div className="grid gap-8 sm:grid-cols-3">
+            {STEPS.map((s, i) => (
               <motion.div
-                key={i}
+                key={s.n}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.5 }}
-                className="text-center"
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                className="rounded-xl border border-border-subtle bg-bg-surface p-6 transition-colors duration-150 hover:border-border-focus"
               >
-                <span className="mb-3 inline-block text-3xl font-black text-accent-primary">
-                  {item.step}
-                </span>
-                <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="mt-2 text-sm text-text-secondary">{item.desc}</p>
+                <span className="font-mono text-3xl font-bold text-accent-primary">{s.n}</span>
+                <h3 className="mt-3 text-lg font-semibold">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-text-secondary">{s.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== BLOCK 4: Result spectrum ===== */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-8 text-2xl font-bold sm:text-3xl">
-            El resultado que recibirás
-          </h2>
-          {/* Spectrum bar */}
-          <div className="mx-auto mb-4 h-3 w-full overflow-hidden rounded-full">
-            <div
-              className="h-full w-full"
-              style={{
-                background:
-                  'linear-gradient(to right, var(--color-regime-laminar) 0%, var(--color-regime-transicion) 33%, var(--color-regime-incipiente) 66%, var(--color-regime-severo) 100%)',
-              }}
-            />
-          </div>
-          {/* Labels */}
-          <div className="mb-8 flex justify-between text-xs text-text-secondary sm:text-sm">
-            <span>Laminar</span>
-            <span>Transición</span>
-            <span>Turb. incipiente</span>
-            <span>Turb. severa</span>
-          </div>
-          <p className="text-text-secondary">
-            ¿Está tu equipo en zona de riesgo? Descúbrelo en 5 minutos.
+      {/* ===== INSTRUMENTO ===== */}
+      <section className="px-4 py-20">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
+            INSTRUMENTO
           </p>
+          <h2 className="mb-4 text-center text-2xl font-bold sm:text-3xl">
+            Batería de evaluación
+          </h2>
+          <p className="mx-auto mb-12 max-w-xl text-center text-sm text-text-secondary">
+            50 ítems distribuidos en 4 bloques. Instrumentos validados internacionalmente.
+          </p>
+
+          <div className="overflow-x-auto rounded-xl border border-border-subtle bg-bg-surface">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-border-subtle text-xs uppercase tracking-wider text-text-muted">
+                  <th className="px-5 py-3 font-mono font-medium">Bloque</th>
+                  <th className="px-5 py-3 font-medium">Instrumento</th>
+                  <th className="px-5 py-3 font-mono font-medium">Ítems</th>
+                  <th className="px-5 py-3 font-mono font-medium">Escala</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-subtle">
+                {INSTRUMENT.map((row) => (
+                  <tr key={row.bloque}>
+                    <td className="px-5 py-3 font-mono font-bold text-accent-primary">{row.bloque}</td>
+                    <td className="px-5 py-3 font-semibold text-text-primary">{row.instrumento}</td>
+                    <td className="px-5 py-3 font-mono text-text-secondary">{row.items}</td>
+                    <td className="px-5 py-3 font-mono text-text-secondary">{row.escala}</td>
+                  </tr>
+                ))}
+                <tr className="border-t border-border-default bg-bg-elevated/50">
+                  <td className="px-5 py-3 font-mono font-bold text-text-primary">Σ</td>
+                  <td className="px-5 py-3 font-semibold text-text-primary">Total</td>
+                  <td className="px-5 py-3 font-mono font-bold text-text-primary">50</td>
+                  <td className="px-5 py-3" />
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      {/* ===== BLOCK 5: RGPD / Consent ===== */}
-      <section className="px-6 py-20 bg-bg-surface/50">
+      {/* ===== TRANSPARENCIA ===== */}
+      <section className="bg-bg-surface/50 px-4 py-20">
         <div className="mx-auto max-w-2xl">
-          <div className="rounded-xl border border-border-default bg-bg-surface p-8">
-            <div className="mb-4 flex items-center gap-3 text-text-secondary">
-              <LockIcon />
-              <h2 className="text-xl font-bold text-text-primary">Transparencia total</h2>
-            </div>
+          <div className="rounded-xl border border-border-subtle bg-bg-surface p-8">
+            <p className="mb-3 font-mono text-xs tracking-[0.2em] text-text-muted uppercase">TRANSPARENCIA</p>
+            <h2 className="mb-4 text-xl font-bold">Datos anónimos. Siempre.</h2>
             <p className="text-sm leading-relaxed text-text-secondary">
-              Este diagnóstico forma parte de una investigación académica sobre
-              bienestar laboral en microempresas tecnológicas españolas,
-              desarrollada en la Universidad Nacional de Educación a Distancia
-              (UNED). Tu participación es voluntaria, anónima y no remunerada.
-              No se recopilan datos identificativos ni direcciones IP. Los datos
-              se utilizan exclusivamente para análisis estadístico agregado con
-              fines académicos. Puedes retirar tu participación en cualquier
-              momento.
+              Investigación académica sobre bienestar laboral en microempresas tecnológicas españolas,
+              desarrollada en la Universidad Nacional de Educación a Distancia (UNED).
+              Participación voluntaria, anónima y no remunerada.
+              Sin datos identificativos. Sin IP. Sin cookies. Los datos se utilizan
+              exclusivamente para análisis estadístico agregado con fines académicos.
             </p>
-            <p className="mt-4 text-xs text-text-secondary">
-              Responsable: Raúl Balaguer Moreno · rbalaguer16@alumno.uned.es
+            <p className="mt-4 font-mono text-xs text-text-muted">
+              ▶ Responsable: Raúl Balaguer Moreno · rbalaguer16@alumno.uned.es
             </p>
           </div>
         </div>
       </section>
 
-      {/* ===== Final CTA ===== */}
-      <section className="px-6 py-20 text-center">
+      {/* ===== CTA FINAL ===== */}
+      <section className="px-4 py-20 text-center">
+        <p className="mb-3 font-mono text-xs tracking-[0.2em] text-text-muted uppercase">⌖ DIAGNÓSTICO</p>
+        <h2 className="mb-6 text-2xl font-bold sm:text-3xl">
+          ¿Listo para calcular tu Re<sub>org</sub>?
+        </h2>
         <Link
           href="/consentimiento"
           className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
         >
-          Comenzar el diagnóstico →
+          Iniciar diagnóstico →
         </Link>
+        <p className="mt-6 font-mono text-xs text-text-muted">
+          UNED · Grado en Psicología · 2025–2026
+        </p>
       </section>
     </main>
   );

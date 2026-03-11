@@ -4,16 +4,28 @@ import { useReducer, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { SurveyState, SurveyAction, BlockB } from '@/types';
-import { ALL_QUESTIONS, TOTAL_ITEMS, BLOCK_TRANSITIONS } from '@/lib/questions';
+import { ALL_QUESTIONS, TOTAL_ITEMS, BLOCK_TRANSITIONS, BLOCK_RANGES } from '@/lib/questions';
 import { calculateIRO } from '@/lib/iro-calculator';
-import ProgressBar from '@/components/survey/ProgressBar';
 import LikertScale7 from '@/components/survey/LikertScale7';
 import MBIScale from '@/components/survey/MBIScale';
 import OregScale from '@/components/survey/OregScale';
 import SocioQuestion from '@/components/survey/SocioQuestion';
 
-// Determine direction for slide animation
-let slideDirection = 1; // 1 = forward, -1 = backward
+// Block metadata for defcon23-style headers
+const BLOCK_META: Record<string, { num: string; label: string; icon: string }> = {
+  A: { num: '01', label: 'Contexto organizacional', icon: '◈' },
+  B: { num: '02', label: 'Dinámica organizacional', icon: '⧫' },
+  C: { num: '03', label: 'Experiencia laboral', icon: '■' },
+  D: { num: '04', label: 'Cambio organizacional', icon: '▶' },
+};
+
+const BLOCK_TRANSITION_MESSAGES: Record<string, { title: string; subtitle: string }> = {
+  'A_B': { title: 'BLOQUE 01 COMPLETADO ◈', subtitle: 'Ahora evaluaremos la dinámica de tu organización' },
+  'B_C': { title: 'BLOQUE 02 COMPLETADO ⧫', subtitle: 'A continuación, sobre tu experiencia personal en el trabajo' },
+  'C_D': { title: 'BLOQUE 03 COMPLETADO ■', subtitle: 'Por último, algunas preguntas sobre el cambio organizacional' },
+};
+
+let slideDirection = 1;
 
 const initialState: SurveyState = {
   currentItem: 0,
@@ -42,7 +54,6 @@ function reducer(state: SurveyState, action: SurveyAction): SurveyState {
   }
 }
 
-// Persist answers to sessionStorage
 function saveToSession(state: SurveyState) {
   try {
     sessionStorage.setItem('survey_state', JSON.stringify({
@@ -55,18 +66,32 @@ function saveToSession(state: SurveyState) {
   }
 }
 
+function getBlockProgress(currentItem: number, block: string) {
+  const range = BLOCK_RANGES[block as keyof typeof BLOCK_RANGES];
+  if (!range) return { pct: 0, current: 0, total: 0 };
+  const blockSize = range.end - range.start + 1;
+  const posInBlock = currentItem - range.start;
+  return {
+    pct: Math.round(((posInBlock + 1) / blockSize) * 100),
+    current: posInBlock + 1,
+    total: blockSize,
+  };
+}
+
+function getBlockIndex(block: string): number {
+  return ['A', 'B', 'C', 'D'].indexOf(block) + 1;
+}
+
 export default function DiagnosticoPage() {
   const router = useRouter();
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Protect route — must have consent
   useEffect(() => {
     const consent = sessionStorage.getItem('consent_at');
     if (!consent) {
       router.replace('/consentimiento');
       return;
     }
-    // Restore previous session if exists
     try {
       const saved = sessionStorage.getItem('survey_state');
       if (saved) {
@@ -78,15 +103,15 @@ export default function DiagnosticoPage() {
     }
   }, [router]);
 
-  // Save on every answer change
   useEffect(() => {
     saveToSession(state);
   }, [state]);
 
   const question = ALL_QUESTIONS[state.currentItem];
   const answerValue = state.answers[question.id as keyof typeof state.answers];
+  const blockMeta = BLOCK_META[question.block];
+  const blockProgress = getBlockProgress(state.currentItem, question.block);
 
-  // Check if moving to next item crosses a block boundary
   const getBlockTransitionMessage = useCallback(
     (fromIdx: number): string | null => {
       if (fromIdx >= TOTAL_ITEMS - 1) return null;
@@ -101,24 +126,31 @@ export default function DiagnosticoPage() {
     [],
   );
 
+  const getBlockTransitionKey = useCallback(
+    (fromIdx: number): string | null => {
+      if (fromIdx >= TOTAL_ITEMS - 1) return null;
+      const currentBlock = ALL_QUESTIONS[fromIdx].block;
+      const nextBlock = ALL_QUESTIONS[fromIdx + 1].block;
+      if (currentBlock !== nextBlock) return `${currentBlock}_${nextBlock}`;
+      return null;
+    },
+    [],
+  );
+
   async function handleAnswer(value: string | number) {
     dispatch({ type: 'SET_ANSWER', key: question.id, value });
 
-    // Last item → submit
     if (state.currentItem === TOTAL_ITEMS - 1) {
       await handleSubmit({ ...state.answers, [question.id]: value });
       return;
     }
 
-    // Check block transition
-    const transMsg = getBlockTransitionMessage(state.currentItem);
-    if (transMsg) {
+    const transKey = getBlockTransitionKey(state.currentItem);
+    if (transKey) {
       dispatch({ type: 'SET_BLOCK_TRANSITION', active: true });
-      // Show transition screen for 2 seconds
-      await new Promise((r) => setTimeout(r, 2000));
+      await new Promise((r) => setTimeout(r, 2200));
       dispatch({ type: 'SET_BLOCK_TRANSITION', active: false });
     } else {
-      // Small delay for auto-advance
       await new Promise((r) => setTimeout(r, 280));
     }
 
@@ -148,7 +180,6 @@ export default function DiagnosticoPage() {
       duration_seconds: durationSeconds,
     };
 
-    // Client-side fallback: calculate IRO locally in case API fails
     const blockB: BlockB = {
       b1: answers.b1 as number, b2: answers.b2 as number, b3: answers.b3 as number, b4: answers.b4 as number,
       b5: answers.b5 as number, b6: answers.b6 as number, b7: answers.b7 as number, b8: answers.b8 as number,
@@ -179,28 +210,89 @@ export default function DiagnosticoPage() {
     router.push('/resultado');
   }
 
-  // Block transition overlay
+  // Block transition splash
   if (state.blockTransition) {
-    const transMsg = getBlockTransitionMessage(state.currentItem);
+    const transKey = getBlockTransitionKey(state.currentItem);
+    const transData = transKey ? BLOCK_TRANSITION_MESSAGES[transKey] : null;
+    const completedBlocks = getBlockIndex(ALL_QUESTIONS[state.currentItem].block);
+
     return (
-      <main className="flex min-h-screen items-center justify-center px-6">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <p className="text-2xl font-semibold sm:text-3xl">
-            {transMsg}
-          </p>
-          <div className="mt-6 flex justify-center">
-            <div className="h-1 w-16 animate-pulse rounded-full bg-accent-primary" />
-          </div>
-        </motion.div>
+      <main className="flex min-h-screen items-center justify-center px-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key="block-transition"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center"
+          >
+            {/* Animated checkmark */}
+            <motion.svg
+              width="64"
+              height="64"
+              viewBox="0 0 64 64"
+              className="mx-auto mb-6 text-accent-primary"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3" />
+              <motion.path
+                d="M20 32 L28 40 L44 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              />
+            </motion.svg>
+
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="font-mono text-sm tracking-[0.2em] text-text-muted"
+            >
+              {transData?.title}
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-3 text-xl font-semibold sm:text-2xl"
+            >
+              {transData?.subtitle}
+            </motion.p>
+
+            {/* Total progress bar */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="mx-auto mt-8 w-48"
+            >
+              <div className="h-1 w-full overflow-hidden rounded-full bg-bg-elevated">
+                <motion.div
+                  className="h-full rounded-full bg-accent-primary"
+                  initial={{ width: `${((completedBlocks - 1) / 4) * 100}%` }}
+                  animate={{ width: `${(completedBlocks / 4) * 100}%` }}
+                  transition={{ duration: 0.6, delay: 0.8 }}
+                />
+              </div>
+              <p className="mt-2 font-mono text-xs text-text-muted">
+                Bloque {completedBlocks}/4
+              </p>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
       </main>
     );
   }
 
-  // Render scale component based on question type
   function renderInput() {
     switch (question.type) {
       case 'likert7':
@@ -243,14 +335,34 @@ export default function DiagnosticoPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col px-6 py-8">
-      {/* Progress */}
+    <main className="flex min-h-screen flex-col px-4 py-8">
+      {/* Block header + progress */}
       <div className="mx-auto w-full max-w-xl">
-        <ProgressBar
-          current={state.currentItem + 1}
-          total={TOTAL_ITEMS}
-          blockLabel={question.blockLabel}
-        />
+        {/* Block label */}
+        <div className="mb-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs tracking-[0.15em] text-text-muted">
+              BLOQUE {blockMeta.num}
+            </span>
+            <span className="font-mono text-xs text-text-muted">{blockMeta.icon}</span>
+          </div>
+          <span className="rounded-full bg-bg-surface px-3 py-0.5 font-mono text-xs text-text-secondary">
+            {blockProgress.pct}% · Bloque {getBlockIndex(question.block)}/4
+          </span>
+        </div>
+
+        <p className="mb-3 text-sm font-medium text-text-secondary">
+          {blockMeta.label}
+        </p>
+
+        {/* Block progress bar */}
+        <div className="h-1 w-full overflow-hidden rounded-full bg-bg-elevated">
+          <motion.div
+            className="h-full rounded-full bg-accent-primary"
+            animate={{ width: `${blockProgress.pct}%` }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          />
+        </div>
       </div>
 
       {/* Question area */}
@@ -264,8 +376,9 @@ export default function DiagnosticoPage() {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="rounded-2xl border border-border-subtle bg-bg-elevated/50 p-6 sm:p-8"
             >
-              <h2 className="mb-8 text-center text-xl font-semibold sm:text-2xl">
+              <h2 className="mb-8 text-center text-lg font-semibold leading-relaxed sm:text-xl">
                 {question.text}
               </h2>
               {renderInput()}
