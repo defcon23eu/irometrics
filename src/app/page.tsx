@@ -127,6 +127,7 @@ export default function HomePage() {
 
       {/* ===== BLOCK 2: Authority metrics ===== */}
       <section className="px-6 py-20">
+        <h2 className="sr-only">Indicadores clave del diagnóstico</h2>
         <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-3">
           {[
             { icon: <ChartIcon />, title: '12 indicadores críticos', desc: 'Evaluación multidimensional de la dinámica interna' },
@@ -230,7 +231,7 @@ export default function HomePage() {
               fines académicos. Puedes retirar tu participación en cualquier
               momento.
             </p>
-            <p className="mt-4 text-xs text-text-muted">
+            <p className="mt-4 text-xs text-text-secondary">
               Responsable: Raúl Balaguer Moreno · rbalaguer16@alumno.uned.es
             </p>
           </div>
