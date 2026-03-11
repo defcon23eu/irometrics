@@ -55,14 +55,14 @@ export default function HomePage() {
     <main className="min-h-screen">
       {/* ===== BLOCK 1: Hero ===== */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #080B10 0%, #0D1520 100%)' }}
+        style={{ background: 'linear-gradient(135deg, var(--color-bg-base) 0%, var(--color-bg-surface) 100%)' }}
       >
         {/* CSS grid background */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(240,246,252,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(240,246,252,0.04) 1px, transparent 1px)',
+              'linear-gradient(var(--color-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
@@ -107,8 +107,7 @@ export default function HomePage() {
           <motion.div variants={fadeUp} custom={3} className="mt-10">
             <Link
               href="/consentimiento"
-              className="inline-flex items-center gap-2 rounded-xl px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-              style={{ background: 'linear-gradient(90deg, #3B82F6, #6366F1)' }}
+              className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
             >
               → Iniciar diagnóstico gratuito
             </Link>
@@ -141,7 +140,6 @@ export default function HomePage() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
               className="rounded-xl border border-border-default bg-bg-surface p-6 text-center"
-              style={{ background: 'linear-gradient(145deg, #0F1318, #161B22)' }}
             >
               <div className="mb-3 flex justify-center text-text-accent">
                 {card.icon}
@@ -242,8 +240,7 @@ export default function HomePage() {
       <section className="px-6 py-20 text-center">
         <Link
           href="/consentimiento"
-          className="inline-flex items-center gap-2 rounded-xl px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-          style={{ background: 'linear-gradient(90deg, #3B82F6, #6366F1)' }}
+          className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
         >
           Comenzar el diagnóstico →
         </Link>

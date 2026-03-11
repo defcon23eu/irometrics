@@ -50,7 +50,7 @@ export const REGIME_MAP: Record<IRORegime, {
 }> = {
   laminar: {
     label: 'Régimen laminar',
-    color: '#34D399',
+    color: 'var(--color-regime-laminar)',
     description:
       'Tu organización presenta una dinámica estable y predecible. Los procesos fluyen de forma ordenada y el equipo opera con baja fricción interna.',
     implications: [
@@ -61,7 +61,7 @@ export const REGIME_MAP: Record<IRORegime, {
   },
   transicion: {
     label: 'Régimen de transición',
-    color: '#FBBF24',
+    color: 'var(--color-regime-transicion)',
     description:
       'Tu organización se encuentra en una zona intermedia. Existen señales de tensión que, si no se gestionan, podrían escalar hacia dinámicas más turbulentas.',
     implications: [
@@ -72,7 +72,7 @@ export const REGIME_MAP: Record<IRORegime, {
   },
   turbulencia_incipiente: {
     label: 'Turbulencia incipiente',
-    color: '#f97316',
+    color: 'var(--color-regime-incipiente)',
     description:
       'Se detectan patrones de turbulencia organizacional emergente. La dinámica del equipo presenta inestabilidad que puede afectar al rendimiento y bienestar.',
     implications: [
@@ -83,7 +83,7 @@ export const REGIME_MAP: Record<IRORegime, {
   },
   turbulencia_severa: {
     label: 'Turbulencia severa',
-    color: '#ef4444',
+    color: 'var(--color-regime-severo)',
     description:
       'La organización muestra una dinámica altamente turbulenta. Los niveles de tensión estructural son elevados y requieren atención inmediata.',
     implications: [
