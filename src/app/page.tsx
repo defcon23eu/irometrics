@@ -1,250 +1,314 @@
 'use client';
 
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { motion, useReducedMotion } from 'framer-motion';
 
-// Inline SVG icon components
-function ChartIcon() {
+/* ─────────────────────────────────────────────
+   Animation helpers
+───────────────────────────────────────────── */
+function useFadeUp(delay: number) {
+  const reduce = useReducedMotion();
+  return {
+    initial: reduce ? { opacity: 0 } : { opacity: 0, y: 16 },
+    animate: reduce ? { opacity: 1 } : { opacity: 1, y: 0 },
+    transition: { duration: reduce ? 0.15 : 0.6, delay, ease: 'easeOut' },
+  };
+}
+
+function useScaleIn(delay: number) {
+  const reduce = useReducedMotion();
+  return {
+    initial: reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 },
+    animate: reduce ? { opacity: 1 } : { opacity: 1, scale: 1 },
+    transition: { duration: reduce ? 0.15 : 0.5, delay, ease: 'easeOut' },
+  };
+}
+
+function useWhileInView(delay: number) {
+  const reduce = useReducedMotion();
+  return {
+    initial: reduce ? { opacity: 0 } : { opacity: 0, y: 20 },
+    whileInView: reduce ? { opacity: 1 } : { opacity: 1, y: 0 },
+    viewport: { once: true },
+    transition: { duration: reduce ? 0.15 : 0.5, delay, ease: 'easeOut' },
+  };
+}
+
+/* ─────────────────────────────────────────────
+   CTA Button (reused in hero + footer)
+───────────────────────────────────────────── */
+function CTAButton() {
+  const router = useRouter();
+  const anim = useScaleIn(0.5);
+
   return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 3v18h18" />
-      <path d="M7 16l4-8 4 4 4-8" />
-    </svg>
+    <motion.button
+      {...anim}
+      onClick={() => router.push('/consentimiento')}
+      className="inline-flex items-center gap-2 rounded-lg bg-accent-primary px-8 py-[14px] font-sans text-base font-medium text-white transition-all duration-150 hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+      aria-label="Iniciar diagnóstico organizacional"
+    >
+      Iniciar diagnóstico →
+    </motion.button>
   );
 }
 
-function GaugeIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
-    </svg>
-  );
-}
-
-function WaveIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0" />
-      <path d="M2 18c2-3 4-3 6 0s4 3 6 0 4-3 6 0" />
-      <path d="M2 6c2-3 4-3 6 0s4 3 6 0 4-3 6 0" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.15, duration: 0.6, ease: 'easeOut' as const },
-  }),
-};
-
+/* ─────────────────────────────────────────────
+   Page
+───────────────────────────────────────────── */
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
-      {/* ===== BLOCK 1: Hero ===== */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, var(--color-bg-base) 0%, var(--color-bg-surface) 100%)' }}
+    <main className="min-h-screen bg-bg-base text-text-primary font-sans">
+
+      {/* ══════════════════════════════════════
+          SECTION 1 · HERO
+      ══════════════════════════════════════ */}
+      <section
+        className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden"
+        aria-labelledby="hero-heading"
       >
-        {/* CSS grid background */}
+        {/* CSS animated grid */}
         <div
+          aria-hidden="true"
           className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage:
-              'linear-gradient(var(--color-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px)',
+              'linear-gradient(rgba(250,250,250,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(250,250,250,0.04) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
-        {/* Radial glow */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-accent-primary/8 blur-3xl" />
+        {/* Radial glow top */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,0.125), transparent)',
+          }}
+        />
 
-        <motion.div
-          className="relative z-10 max-w-3xl text-center"
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
-        >
-          {/* Badge */}
+        <div className="relative z-10 flex flex-col items-center text-center gap-6 max-w-[640px]">
+
+          {/* Trust badge */}
           <motion.p
-            variants={fadeUp}
-            custom={0}
-            className="mb-6 inline-block rounded-full border border-border-default px-4 py-1.5 text-xs tracking-wide text-text-secondary"
+            {...useFadeUp(0)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-accent-primary/30 bg-accent-subtle px-4 py-1.5 font-sans text-xs text-text-secondary"
           >
-            Investigación independiente · UNED · 2026
+            ✦ Estudio académico · UNED Psicología · 2025-2026
           </motion.p>
 
           {/* Headline */}
           <motion.h1
-            variants={fadeUp}
-            custom={1}
-            className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl"
+            id="hero-heading"
+            {...useFadeUp(0.1)}
+            className="text-balance font-sans font-bold text-text-primary text-center"
+            style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: 1.15 }}
           >
-            Mide la turbulencia de tu organización.
+            ¿En qué régimen opera
+            <br className="hidden sm:block" /> tu organización?
           </motion.h1>
 
           {/* Subheadline */}
           <motion.p
-            variants={fadeUp}
-            custom={2}
-            className="mt-6 text-lg text-text-secondary sm:text-xl"
+            {...useFadeUp(0.2)}
+            className="max-w-[480px] font-sans text-lg text-text-secondary text-center text-pretty"
           >
-            Diagnóstico avanzado de dinámica estructural y desgaste de equipos
-            para microempresas tecnológicas.
+            Diagnóstico de dinámica organizacional basado en el Índice de Reynolds
+          </motion.p>
+
+          {/* IRO Equation */}
+          <motion.div
+            {...useFadeUp(0.3)}
+            className="flex flex-col items-center gap-2"
+          >
+            <hr
+              aria-hidden="true"
+              className="w-60 border-border-subtle opacity-20"
+            />
+            <span
+              className="font-mono text-lg text-accent-primary cursor-help"
+              title="Índice de Reynolds Organizacional"
+              aria-label="Fórmula del Índice de Reynolds Organizacional: Re_org = (δ · v · D) dividido entre μ"
+            >
+              Re_org = (δ · v · D) / μ
+            </span>
+            <hr
+              aria-hidden="true"
+              className="w-60 border-border-subtle opacity-20"
+            />
+          </motion.div>
+
+          {/* Stats row */}
+          <motion.p
+            {...useFadeUp(0.4)}
+            className="font-sans text-sm text-text-muted"
+            aria-label="8 minutos · 50 ítems · Resultado inmediato"
+          >
+            8 min · 50 ítems · Resultado inmediato
           </motion.p>
 
           {/* CTA */}
-          <motion.div variants={fadeUp} custom={3} className="mt-10">
-            <Link
-              href="/consentimiento"
-              className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-            >
-              → Iniciar diagnóstico gratuito
-            </Link>
-          </motion.div>
+          <CTAButton />
 
-          {/* Trust line */}
+          {/* Privacy note */}
           <motion.p
-            variants={fadeUp}
-            custom={4}
-            className="mt-4 text-sm text-text-muted"
+            {...useFadeUp(0.6)}
+            className="font-sans text-xs text-text-muted text-center"
           >
-            5 minutos · 100 % anónimo · Sin registro
+            Datos anonimizados · Almacenamiento EU-Frankfurt · RGPD 2016/679
           </motion.p>
-        </motion.div>
+        </div>
       </section>
 
-      {/* ===== BLOCK 2: Authority metrics ===== */}
-      <section className="px-6 py-20">
-        <h2 className="sr-only">Indicadores clave del diagnóstico</h2>
-        <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-3">
+      {/* ══════════════════════════════════════
+          SECTION 2 · HOW IT WORKS
+      ══════════════════════════════════════ */}
+      <section
+        className="border-y border-border-subtle bg-bg-surface py-16 px-4"
+        aria-labelledby="how-heading"
+      >
+        <h2 id="how-heading" className="sr-only">Cómo funciona el diagnóstico</h2>
+        <div className="mx-auto grid max-w-4xl gap-6 grid-cols-1 md:grid-cols-3">
           {[
-            { icon: <ChartIcon />, title: '12 indicadores críticos', desc: 'Evaluación multidimensional de la dinámica interna' },
-            { icon: <GaugeIcon />, title: 'Régimen en tiempo real', desc: 'Resultado inmediato con clasificación visual' },
-            { icon: <WaveIcon />, title: 'Basado en física de fluidos', desc: 'Modelo analítico inspirado en dinámica de fluidos' },
+            {
+              icon: '◈',
+              title: 'Responde 50 preguntas',
+              desc: 'Evalúa densidad, velocidad, dispersión y viscosidad organizacional',
+            },
+            {
+              icon: '⟳',
+              title: 'El IRO se calcula',
+              desc: 'Re_org = (δ·v·D)/μ aplicado a tu contexto específico',
+            },
+            {
+              icon: '◉',
+              title: 'Recibe tu diagnóstico',
+              desc: 'Régimen laminar, transición o turbulencia con descripción detallada',
+            },
           ].map((card, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="rounded-xl border border-border-default bg-bg-surface p-6 text-center"
+            <motion.article
+              key={card.title}
+              {...useWhileInView(i * 0.12)}
+              className="rounded-xl border border-border-subtle bg-bg-elevated p-6 flex flex-col gap-3"
             >
-              <div className="mb-3 flex justify-center text-text-accent">
+              <span
+                aria-hidden="true"
+                className="font-mono text-2xl text-accent-primary"
+              >
                 {card.icon}
-              </div>
-              <h3 className="text-lg font-semibold">{card.title}</h3>
-              <p className="mt-2 text-sm text-text-secondary">{card.desc}</p>
-            </motion.div>
+              </span>
+              <h3 className="font-sans text-base font-semibold text-text-primary">
+                {card.title}
+              </h3>
+              <p className="font-sans text-sm text-text-secondary leading-relaxed">
+                {card.desc}
+              </p>
+            </motion.article>
           ))}
         </div>
       </section>
 
-      {/* ===== BLOCK 3: How it works ===== */}
-      <section className="px-6 py-20 bg-bg-surface/50">
-        <div className="mx-auto max-w-3xl">
-          <h2 className="mb-12 text-center text-2xl font-bold sm:text-3xl">
-            Cómo funciona
-          </h2>
-          <div className="grid gap-10 sm:grid-cols-3">
+      {/* ══════════════════════════════════════
+          SECTION 3 · REGIME PREVIEW
+      ══════════════════════════════════════ */}
+      <section
+        className="py-16 px-4"
+        aria-labelledby="regimes-heading"
+      >
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center">
+            <h2
+              id="regimes-heading"
+              className="font-sans text-2xl font-semibold text-text-primary text-balance"
+            >
+              Cuatro regímenes posibles
+            </h2>
+            <p className="mt-2 font-sans text-sm text-text-secondary">
+              Tu resultado caerá en uno de estos rangos
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {[
-              { step: '01', title: 'Describe tu organización', desc: '5 preguntas contextuales sobre tu empresa y equipo' },
-              { step: '02', title: 'Evalúa la dinámica', desc: 'Indicadores de dinámica organizacional, bienestar y adaptación al cambio' },
-              { step: '03', title: 'Recibe tu régimen', desc: 'Resultado visual inmediato con tu nivel de turbulencia organizacional' },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.5 }}
-                className="text-center"
+              {
+                color: '#22C55E',
+                label: 'Flujo Laminar',
+                range: 'Re_org < 100',
+                desc: 'Alta estabilidad organizacional. Procesos fluidos y coordinación eficiente.',
+              },
+              {
+                color: '#EAB308',
+                label: 'Régimen de Transición',
+                range: '100 ≤ Re_org < 800',
+                desc: 'Tensión moderada. Señales tempranas de turbulencia organizacional.',
+              },
+              {
+                color: '#F97316',
+                label: 'Turbulencia Incipiente',
+                range: '800 ≤ Re_org < 1200',
+                desc: 'Dinámica compleja. Riesgo elevado de desgaste profesional.',
+              },
+              {
+                color: '#EF4444',
+                label: 'Turbulencia Severa',
+                range: 'Re_org ≥ 1200',
+                desc: 'Régimen crítico. Intervención preventiva urgente recomendada.',
+              },
+            ].map((regime, i) => (
+              <motion.article
+                key={regime.label}
+                {...useWhileInView(i * 0.1)}
+                className="rounded-xl border border-border-subtle bg-bg-surface p-5 flex flex-col gap-2"
+                style={{ borderLeftWidth: '4px', borderLeftColor: regime.color }}
               >
-                <span className="mb-3 inline-block text-3xl font-black text-accent-primary">
-                  {item.step}
-                </span>
-                <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="mt-2 text-sm text-text-secondary">{item.desc}</p>
-              </motion.div>
+                <h3
+                  className="font-sans text-base font-semibold text-text-primary"
+                  style={{ color: regime.color }}
+                >
+                  {regime.label}
+                </h3>
+                <p className="font-mono text-xs text-text-muted">
+                  {regime.range}
+                </p>
+                <p className="font-sans text-sm text-text-secondary leading-relaxed">
+                  {regime.desc}
+                </p>
+              </motion.article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== BLOCK 4: Result spectrum ===== */}
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-8 text-2xl font-bold sm:text-3xl">
-            El resultado que recibirás
-          </h2>
-          {/* Spectrum bar */}
-          <div className="mx-auto mb-4 h-3 w-full overflow-hidden rounded-full">
-            <div
-              className="h-full w-full"
-              style={{
-                background:
-                  'linear-gradient(to right, var(--color-regime-laminar) 0%, var(--color-regime-transicion) 33%, var(--color-regime-incipiente) 66%, var(--color-regime-severo) 100%)',
-              }}
-            />
-          </div>
-          {/* Labels */}
-          <div className="mb-8 flex justify-between text-xs text-text-secondary sm:text-sm">
-            <span>Laminar</span>
-            <span>Transición</span>
-            <span>Turb. incipiente</span>
-            <span>Turb. severa</span>
-          </div>
-          <p className="text-text-secondary">
-            ¿Está tu equipo en zona de riesgo? Descúbrelo en 5 minutos.
+      {/* ══════════════════════════════════════
+          SECTION 4 · CTA FOOTER
+      ══════════════════════════════════════ */}
+      <section
+        className="py-20 px-4 bg-bg-base text-center flex flex-col items-center gap-6"
+        aria-labelledby="cta-footer-heading"
+      >
+        <h2
+          id="cta-footer-heading"
+          className="font-sans text-3xl font-semibold text-text-primary text-balance"
+          style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)' }}
+        >
+          ¿Listo para conocer tu Re_org?
+        </h2>
+
+        <CTAButton />
+
+        <div className="flex items-center gap-3 mt-2">
+          <div
+            className="w-8 h-8 rounded bg-bg-elevated border border-border-subtle flex-shrink-0"
+            aria-hidden="true"
+            role="img"
+            aria-label="Sello UNED"
+          />
+          <p className="font-sans text-xs text-text-muted text-left">
+            Estudio avalado por UNED · Grado en Psicología · Curso 2025-2026
           </p>
         </div>
       </section>
 
-      {/* ===== BLOCK 5: RGPD / Consent ===== */}
-      <section className="px-6 py-20 bg-bg-surface/50">
-        <div className="mx-auto max-w-2xl">
-          <div className="rounded-xl border border-border-default bg-bg-surface p-8">
-            <div className="mb-4 flex items-center gap-3 text-text-secondary">
-              <LockIcon />
-              <h2 className="text-xl font-bold text-text-primary">Transparencia total</h2>
-            </div>
-            <p className="text-sm leading-relaxed text-text-secondary">
-              Este diagnóstico forma parte de una investigación académica sobre
-              bienestar laboral en microempresas tecnológicas españolas,
-              desarrollada en la Universidad Nacional de Educación a Distancia
-              (UNED). Tu participación es voluntaria, anónima y no remunerada.
-              No se recopilan datos identificativos ni direcciones IP. Los datos
-              se utilizan exclusivamente para análisis estadístico agregado con
-              fines académicos. Puedes retirar tu participación en cualquier
-              momento.
-            </p>
-            <p className="mt-4 text-xs text-text-secondary">
-              Responsable: Raúl Balaguer Moreno · rbalaguer16@alumno.uned.es
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Final CTA ===== */}
-      <section className="px-6 py-20 text-center">
-        <Link
-          href="/consentimiento"
-          className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-        >
-          Comenzar el diagnóstico →
-        </Link>
-      </section>
     </main>
   );
 }
