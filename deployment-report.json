@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-03-11",
+  "url": "https://irometrics.app",
+  "vercel_deploy_url": "https://irometrics-mt65a7qbu-synapsys-projects.vercel.app",
+  "supabase_region": "eu-central-1",
+  "build_errors": 0,
+  "routes": 7,
+  "lighthouse_performance": 0.96,
+  "lighthouse_accessibility": 0.85,
+  "rgpd_compliant": true,
+  "tests_passed": 3,
+  "status": "PRODUCTION_READY",
+  "url_produccion": "https://irometrics.app",
+  "timestamp_live": "2026-03-11T18:55:12.700Z",
+  "lighthouse_best_practices": 1
+}

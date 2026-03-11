@@ -1,26 +1,118 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ============================
+   Tailwind v4 Design Tokens
+   ============================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* --- Backgrounds --- */
+  --color-bg-base:      #080B10;
+  --color-bg-surface:   #0F1318;
+  --color-bg-elevated:  #161B22;
+  --color-bg-overlay:   #1C2128;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* --- Text --- */
+  --color-text-primary:   #F0F6FC;
+  --color-text-secondary: #8B949E;
+  --color-text-muted:     #484F58;
+  --color-text-accent:    #58A6FF;
+
+  /* --- Accent / Brand --- */
+  --color-accent-primary: #3B82F6;
+  --color-accent-hover:   #2563EB;
+  --color-accent-glow:    rgba(59, 130, 246, 0.15);
+  --color-accent-border:  rgba(59, 130, 246, 0.3);
+
+  /* --- Regime colors --- */
+  --color-regime-laminar:    #22C55E;
+  --color-regime-transicion: #EAB308;
+  --color-regime-incipiente: #F97316;
+  --color-regime-severo:     #EF4444;
+
+  /* --- Borders --- */
+  --color-border-default: rgba(240, 246, 252, 0.1);
+  --color-border-focus:   rgba(59, 130, 246, 0.5);
+  --color-border-success: rgba(34, 197, 94, 0.5);
+
+  /* --- Fonts --- */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* --- Shadows --- */
+  --shadow-glow: 0 0 24px rgba(59, 130, 246, 0.2);
+
+  /* --- Animations --- */
+  --animate-fade-in: fade-in 0.4s ease-out;
+  --animate-slide-in-right: slide-in-right 0.3s ease-out;
+  --animate-slide-out-left: slide-out-left 0.2s ease-out;
+  --animate-gauge-spin: gauge-spin 1.5s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slide-in-right {
+    from { opacity: 0; transform: translateX(40px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slide-out-left {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(-40px); }
+  }
+  @keyframes gauge-spin {
+    from { transform: rotate(-90deg); }
   }
 }
 
+/* ============================
+   Base Styles
+   ============================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+/* ============================
+   Focus-visible (keyboard only)
+   ============================ */
+:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ============================
+   Scrollbar (webkit)
+   ============================ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-elevated);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+}
+
+/* ============================
+   Utility: gauge glow filter
+   ============================ */
+.gauge-glow {
+  filter: drop-shadow(0 0 8px var(--glow-color, var(--color-accent-primary)));
 }
