@@ -1,4 +1,4 @@
-import type { BlockB, BlockC, IRORegime, IROResult } from '@/types';
+import type { BlockB, BlockC, BlockD, IRORegime, IROResult } from '@/types';
 
 // IRO Formula: Re_org = (Σδ · Σv · ΣD) / Σμ
 // Each subscale: 3 items × Likert 1-7 → range [3, 21]
@@ -21,7 +21,7 @@ export function calculateIRO(blockB: BlockB): IROResult {
   const mu = sumItems(blockB, MU_ITEMS);
 
   // Prevent division by zero — mu minimum is 3 (three items × Likert min 1)
-  const safeMu = Math.max(mu, 1);
+  const safeMu = Math.max(mu, 3);
   const re_org = (delta * v * D) / safeMu;
 
   const reOrgRounded = Math.round(re_org * 100) / 100;
@@ -98,24 +98,93 @@ export const REGIME_MAP: Record<IRORegime, {
 };
 
 // ─── MBI-GS Subscales — Gil-Monte (2002) Spanish validation ───
-// Agotamiento: c1-c5 | Cinismo: c6-c9, c16 | Eficacia: c10-c15 (INVERSA)
+// Agotamiento: c1-c5 | Cinismo: c6-c9, c16 | Eficacia: c10-c15
 export const MBI_GS_SUBSCALES = {
   agotamiento: ['c1', 'c2', 'c3', 'c4', 'c5'],
   cinismo: ['c6', 'c7', 'c8', 'c9', 'c16'],
   eficacia: ['c10', 'c11', 'c12', 'c13', 'c14', 'c15'],
 } as const;
 
-export function calculateMBI(blockC: BlockC) {
+/**
+ * calculateMBIScores — para H1, H2, H3
+ * Eficacia en DIRECCIÓN DIRECTA (a mayor puntuación, mayor eficacia percibida).
+ * H3 predice: IRO↑ → eficacia↓ (correlación negativa con puntuación directa).
+ * NO invertir aquí. Referencia: Schaufeli et al. (1996); Gil-Monte (2002).
+ */
+export function calculateMBIScores(blockC: BlockC) {
   const agotamiento = MBI_GS_SUBSCALES.agotamiento.reduce(
     (sum, id) => sum + (blockC[id as keyof BlockC] ?? 0), 0
   );
   const cinismo = MBI_GS_SUBSCALES.cinismo.reduce(
     (sum, id) => sum + (blockC[id as keyof BlockC] ?? 0), 0
   );
-  // Inverse scoring for Professional Efficacy (Gil-Monte, 2002):
-  // item_score = 6 - response (MBI-GS scale 0–6)
+  // Eficacia SIN inversión para hipótesis directas H1-H3
   const eficacia = MBI_GS_SUBSCALES.eficacia.reduce(
-    (sum, id) => sum + (6 - (blockC[id as keyof BlockC] ?? 0)), 0
+    (sum, id) => sum + (blockC[id as keyof BlockC] ?? 0), 0
   );
   return { agotamiento, cinismo, eficacia };
+}
+
+/**
+ * calculateMBIBurnoutIndex — SOLO si se construye índice global exploratorio
+ * Invierte eficacia para que alto = más burnout en todas las dimensiones.
+ * NO usar para H1–H3.
+ */
+export function calculateMBIBurnoutIndex(blockC: BlockC) {
+  const { agotamiento, cinismo, eficacia } = calculateMBIScores(blockC);
+  const eficaciaInv = (6 * 6) - eficacia; // máximo teórico 36, invertido
+  const burnoutGlobal = agotamiento + cinismo + eficaciaInv;
+  return { agotamiento, cinismo, eficaciaInv, burnoutGlobal };
+}
+
+/**
+ * @deprecated Usar calculateMBIScores para H1-H3. Mantenido por compatibilidad.
+ */
+export function calculateMBI(blockC: BlockC) {
+  return calculateMBIScores(blockC);
+}
+
+// ─── Oreg RTC — Oreg et al. (2008) cross-cultural validation ───
+
+export const OREG_SUBSCALES = {
+  busquedaRutina: ['d1', 'd2', 'd3', 'd4', 'd5'],
+  reaccionEmocional: ['d6', 'd7', 'd8', 'd9'],
+  rigidezCognitiva: ['d10', 'd11', 'd12', 'd13'],
+  orientacionCP: ['d14', 'd15', 'd16', 'd17'],
+} as const;
+
+/**
+ * Inversión escala Oreg (1–6): inv(v) = 7 − v
+ * D4: "Siempre que mi vida se vuelve rutinaria, busco formas de cambiarla"
+ * D13: "A menudo cambio de opinión"
+ * Referencia: Oreg (2003, JAP); Oreg et al. (2008, JAP).
+ */
+export function calculateRTC(blockD: BlockD) {
+  const inv = (v: number) => 7 - v;
+
+  const busquedaRutina = (
+    blockD.d1 + blockD.d2 + blockD.d3 + inv(blockD.d4) + blockD.d5
+  ) / 5;
+
+  const reaccionEmocional = (
+    blockD.d6 + blockD.d7 + blockD.d8 + blockD.d9
+  ) / 4;
+
+  const rigidezCognitiva = (
+    blockD.d10 + blockD.d11 + blockD.d12 + inv(blockD.d13)
+  ) / 4;
+
+  const orientacionCP = (
+    blockD.d14 + blockD.d15 + blockD.d16 + blockD.d17
+  ) / 4;
+
+  // Puntuación total: media de los 17 ítems con inversión aplicada
+  const rtcTotal = (
+    blockD.d1 + blockD.d2 + blockD.d3 + inv(blockD.d4) + blockD.d5 +
+    blockD.d6 + blockD.d7 + blockD.d8 + blockD.d9 +
+    blockD.d10 + blockD.d11 + blockD.d12 + inv(blockD.d13) +
+    blockD.d14 + blockD.d15 + blockD.d16 + blockD.d17
+  ) / 17;
+
+  return { busquedaRutina, reaccionEmocional, rigidezCognitiva, orientacionCP, rtcTotal };
 }
