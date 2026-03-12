@@ -2,16 +2,16 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-
-type Regime = "laminar" | "transicional" | "turbulencia_incipiente" | "turbulencia_severa"
+import type { IRORegime } from "@/types"
 
 interface RegimeCardProps {
-  regime: Regime
+  regime: IRORegime
   reOrg: number
   description?: string
+  showDetails?: boolean
 }
 
-const REGIME_DATA: Record<Regime, {
+const REGIME_DATA: Record<IRORegime, {
   title: string
   emoji: string
   colorVar: string
@@ -31,8 +31,8 @@ const REGIME_DATA: Record<Regime, {
       { label: "Guía mantenimiento preventivo",   url: "https://osha.europa.eu/es/publications" },
     ],
   },
-  transicional: {
-    title: "Flujo Transicional",
+  transicion: {
+    title: "Flujo de Transición",
     emoji: "🟡",
     colorVar: "var(--color-regime-transicion)",
     bgVar:    "var(--color-regime-transicion-bg)",

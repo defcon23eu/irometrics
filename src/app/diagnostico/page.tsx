@@ -11,6 +11,7 @@ import MBIScale from '@/components/survey/MBIScale';
 import OregScale from '@/components/survey/OregScale';
 import SocioQuestion from '@/components/survey/SocioQuestion';
 import NumericInput from '@/components/survey/NumericInput';
+import { ProgressSpectrum } from '@/components/iro';
 
 // Block metadata for defcon23-style headers
 const BLOCK_META: Record<string, { num: string; label: string; icon: string }> = {
@@ -411,6 +412,14 @@ export default function DiagnosticoPage() {
 
   return (
     <main className="flex min-h-screen flex-col px-4 py-8">
+      {/* Global IRO progress spectrum */}
+      <div className="mx-auto mb-6 w-full max-w-xl">
+        <ProgressSpectrum
+          currentStep={state.currentItem + 1}
+          totalSteps={TOTAL_ITEMS}
+        />
+      </div>
+
       {/* Block header + progress */}
       <div className="mx-auto w-full max-w-xl">
         {/* Block label */}

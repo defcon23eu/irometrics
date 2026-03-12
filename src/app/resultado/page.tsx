@@ -7,6 +7,7 @@ import Link from 'next/link';
 import type { IROResult } from '@/types';
 import { REGIME_MAP } from '@/lib/iro-calculator';
 import IROGauge from '@/components/resultado/IROGauge';
+import { RegimeCard } from '@/components/iro';
 
 // ─── Count-up with easing + reduced-motion ───
 function useCountUp(target: number, duration = 1800, delay = 200) {
@@ -198,6 +199,37 @@ export default function ResultadoPage() {
             ))}
           </ul>
         </motion.section>
+
+        {/* Regime Card — Visual summary */}
+        <motion.div variants={BLOCK_VARIANTS} className="mt-10">
+          <RegimeCard
+            regime={result.regime}
+            reOrg={result.re_org}
+            showDetails={false}
+          />
+        </motion.div>
+
+        {/* Share Button */}
+        <motion.div variants={BLOCK_VARIANTS} className="mt-8 flex justify-center">
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.vibrate?.([50]);
+                navigator.share({
+                  title: 'Mi diagnóstico IRO',
+                  text: `Mi régimen organizacional: ${regime.label} (Re_org: ${result.re_org.toFixed(2)})`,
+                  url: window.location.origin,
+                });
+              }
+            }}
+            className="inline-flex items-center gap-2 rounded-xl border border-accent-primary/30 bg-accent-subtle px-6 py-3 text-sm font-medium text-accent-primary transition-all duration-200 hover:border-accent-primary hover:bg-accent-primary/10 active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            Compartir resultado
+          </button>
+        </motion.div>
 
         {/* Academic footer */}
         <motion.div variants={BLOCK_VARIANTS} className="mt-16 border-t border-border-subtle pt-6 text-center">
