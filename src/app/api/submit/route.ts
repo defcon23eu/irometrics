@@ -91,6 +91,7 @@ export async function POST(request: Request) {
       d17: data.d17,
       // Computed
       re_org: iroResult.re_org,
+      re_org_log: iroResult.re_org_log,
       regime: iroResult.regime,
     });
 
