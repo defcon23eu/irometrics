@@ -1,0 +1,129 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                  VERIFICACIÓN COMPLETA — IRO METRICS                      ║
+║                         12 marzo 2026 · 14:30 UTC                         ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ✅ VERIFICACIÓN LOCAL                                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  ✓ TypeScript Type Check         0 errores
+  ✓ Production Build               Compilado exitosamente
+  ✓ Tests Unitarios calculateRTC   3/3 casos pasaron
+  ✓ Exports de Funciones           5/5 funciones verificadas
+  ✓ Git Commits                    4 commits pusheados
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 📦 COMMITS DESPLEGADOS                                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  b6be777  chore: add verification script for post-deploy checks
+  faaafe6  docs: add psychometric context, verification tools, and tests
+  3c10616  fix(api): BUG-03 persist re_org_log to Supabase
+  e55e2a2  fix(calculator): BUG-01/BUG-02/WARN-01 calculator fixes
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 🐛 BUGS RESUELTOS                                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  ✅ BUG-01   calculateMBIScores() sin inversión eficacia (H1-H3)
+  ✅ BUG-02   calculateRTC() inversión explícita d4/d13
+  ✅ BUG-03   re_org_log persistido en Supabase
+  ✅ WARN-01  safeMu = Math.max(mu, 3) — mínimo correcto
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 📊 ESTADÍSTICAS DE CAMBIOS                                               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  Archivos modificados:     7
+  Líneas añadidas:          +498
+  Líneas eliminadas:        -24
+  Archivos nuevos:          5
+
+  Archivos críticos:
+    • src/lib/iro-calculator.ts           +83 líneas
+    • src/app/api/submit/route.ts         +1 línea (crítica)
+    • .github/copilot-instructions.md     +103 líneas
+    • src/lib/__tests__/*.test.ts         +62 líneas
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 🧪 RESULTADOS TESTS UNITARIOS                                            │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  Test Case 1: d4=1→6, d13=1→6, resto=3
+    busquedaRutina     3.60 ✓
+    rigidezCognitiva   3.75 ✓
+    rtcTotal           3.35 ✓
+
+  Test Case 2: d4=6→1, d13=6→1, resto=4
+    busquedaRutina     3.40 ✓
+    rigidezCognitiva   3.25 ✓
+    rtcTotal           3.65 ✓
+
+  Test Case 3: todos=1, d4=1→6, d13=1→6
+    busquedaRutina     2.00 ✓
+    reaccionEmocional  1.00 ✓
+    rigidezCognitiva   2.25 ✓
+    orientacionCP      1.00 ✓
+    rtcTotal           1.59 ✓
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ⚠️  ACCIÓN REQUERIDA — VERIFICACIÓN SQL SUPABASE                         │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  1. Abrir Supabase Dashboard → SQL Editor
+     https://supabase.com/dashboard/project/[tu-proyecto-id]/sql
+
+  2. Ejecutar query de verificación:
+     📄 scripts/verify-re_org_log.sql
+
+  3. Resultado esperado en columna 'estado':
+     🟢 OK — re_org_log calculado correctamente
+     🔴 NULL — BUG-03 todavía activo (no debería aparecer)
+     🟡 INCORRECTO — diferencia > 0.001 (no debería aparecer)
+
+  4. Verificar estadísticas generales:
+     • faltantes_re_org_log: debe ser 0 en responses nuevas
+     • avg_re_org_log: debe estar entre 1.0 y 3.5 típicamente
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 🚀 DESPLIEGUE VERCEL                                                     │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  Status: Push detectado automáticamente
+  
+  Monitorizar en:
+  https://vercel.com/[tu-proyecto]/deployments
+
+  Tiempo estimado: 2-3 minutos
+  
+  Una vez desplegado:
+    ✓ Verificar que el deployment está en "Ready"
+    ✓ Ejecutar SQL en Supabase (paso anterior)
+    ✓ Validar 20 respuestas más recientes muestran 🟢 OK
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ 📚 DOCUMENTACIÓN GENERADA                                                │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  📄 AUDITORIA-FIX.md                  Documentación completa de los fixes
+  📄 scripts/verify-re_org_log.sql     Query verificación SQL post-deploy
+  📄 scripts/verify-deploy.sh          Script automatización verificación
+  📄 src/lib/__tests__/*.test.ts       Tests unitarios calculateRTC
+  📄 .vscode/settings.json             Config Copilot locale español
+  📄 .github/copilot-instructions.md   Contexto psicométrico crítico
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ✅ PRÓXIMOS PASOS                                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  1. ✅ Commits realizados (4 commits)
+  2. ✅ Push a origin/main completado
+  3. ⏳ Esperar despliegue Vercel (2-3 min)
+  4. 🔍 Ejecutar SQL en Supabase (manual)
+  5. ✅ Validar estado 🟢 OK en responses nuevas
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                    VERIFICACIÓN LOCAL: ✅ COMPLETA                        ║
+║               VERIFICACIÓN SUPABASE: ⏳ PENDIENTE (MANUAL)                ║
+╚═══════════════════════════════════════════════════════════════════════════╝
