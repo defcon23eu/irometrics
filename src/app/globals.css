@@ -50,10 +50,13 @@
   --shadow-glow: 0 0 24px #6366F133;
 
   /* --- Animations --- */
-  --animate-fade-in: fade-in 0.4s ease-out;
+  --animate-fade-in:        fade-in 0.4s ease-out;
   --animate-slide-in-right: slide-in-right 0.3s ease-out;
   --animate-slide-out-left: slide-out-left 0.2s ease-out;
-  --animate-gauge-spin: gauge-spin 1.5s ease-out;
+  --animate-gauge-spin:     gauge-spin 1.5s ease-out;
+  --animate-shimmer:        shimmer 2s linear infinite;
+  --animate-pulse-glow:     pulse-glow 2s ease infinite;
+  --animate-float:          float 3s ease-in-out infinite;
 
   @keyframes fade-in {
     from { opacity: 0; transform: translateY(8px); }
@@ -69,6 +72,18 @@
   }
   @keyframes gauge-spin {
     from { transform: rotate(-90deg); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 5px currentColor; }
+    50%       { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-6px); }
   }
 }
 
@@ -124,4 +139,18 @@ body {
    ============================ */
 .gauge-glow {
   filter: drop-shadow(0 0 8px var(--glow-color, var(--color-accent-primary)));
+}
+
+/* ============================
+   Utility: shimmer skeleton
+   ============================ */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.04) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
 }
