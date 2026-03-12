@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useEffect, useCallback } from 'react';
+import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { SurveyState, SurveyAction, BlockB } from '@/types';
@@ -10,6 +10,7 @@ import LikertScale7 from '@/components/survey/LikertScale7';
 import MBIScale from '@/components/survey/MBIScale';
 import OregScale from '@/components/survey/OregScale';
 import SocioQuestion from '@/components/survey/SocioQuestion';
+import NumericInput from '@/components/survey/NumericInput';
 
 // Block metadata for defcon23-style headers
 const BLOCK_META: Record<string, { num: string; label: string; icon: string }> = {
@@ -112,6 +113,20 @@ export default function DiagnosticoPage() {
   const blockMeta = BLOCK_META[question.block];
   const blockProgress = getBlockProgress(state.currentItem, question.block);
 
+  // ─── Auto-advance refs (BUG-01 fix) ───
+  const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isNavigatingBack = useRef(false);
+
+  function clearAutoAdvance() {
+    if (autoAdvanceRef.current) {
+      clearTimeout(autoAdvanceRef.current);
+      autoAdvanceRef.current = null;
+    }
+  }
+
+  // Cleanup on unmount
+  useEffect(() => () => clearAutoAdvance(), []);
+
   const getBlockTransitionMessage = useCallback(
     (fromIdx: number): string | null => {
       if (fromIdx >= TOTAL_ITEMS - 1) return null;
@@ -137,32 +152,83 @@ export default function DiagnosticoPage() {
     [],
   );
 
-  async function handleAnswer(value: string | number) {
+  // ─── Advance to next item (shared logic) ───
+  function advanceToNextItem() {
+    const transKey = getBlockTransitionKey(state.currentItem);
+    if (transKey) {
+      dispatch({ type: 'SET_BLOCK_TRANSITION', active: true });
+      autoAdvanceRef.current = setTimeout(() => {
+        dispatch({ type: 'SET_BLOCK_TRANSITION', active: false });
+        slideDirection = 1;
+        dispatch({ type: 'NEXT_ITEM' });
+      }, 2200);
+    } else {
+      slideDirection = 1;
+      dispatch({ type: 'NEXT_ITEM' });
+    }
+  }
+
+  // ─── Likert/MBI/Oreg: auto-advance after 280ms ───
+  function handleLikertAnswer(value: number) {
+    if (isNavigatingBack.current) return;
+    clearAutoAdvance();
+
     dispatch({ type: 'SET_ANSWER', key: question.id, value });
 
     if (state.currentItem === TOTAL_ITEMS - 1) {
-      await handleSubmit({ ...state.answers, [question.id]: value });
+      handleSubmit({ ...state.answers, [question.id]: value });
       return;
     }
 
     const transKey = getBlockTransitionKey(state.currentItem);
     if (transKey) {
       dispatch({ type: 'SET_BLOCK_TRANSITION', active: true });
-      await new Promise((r) => setTimeout(r, 2200));
-      dispatch({ type: 'SET_BLOCK_TRANSITION', active: false });
+      autoAdvanceRef.current = setTimeout(() => {
+        dispatch({ type: 'SET_BLOCK_TRANSITION', active: false });
+        slideDirection = 1;
+        dispatch({ type: 'NEXT_ITEM' });
+      }, 2200);
     } else {
-      await new Promise((r) => setTimeout(r, 280));
+      autoAdvanceRef.current = setTimeout(() => {
+        slideDirection = 1;
+        dispatch({ type: 'NEXT_ITEM' });
+      }, 280);
     }
-
-    slideDirection = 1;
-    dispatch({ type: 'NEXT_ITEM' });
   }
 
-  function handlePrev() {
-    if (state.currentItem > 0) {
-      slideDirection = -1;
-      dispatch({ type: 'PREV_ITEM' });
+  // ─── Select: store answer only (no auto-advance) ───
+  function handleSelectAnswer(value: string) {
+    dispatch({ type: 'SET_ANSWER', key: question.id, value });
+  }
+
+  // ─── Explicit advance (number confirm / select "Siguiente") ───
+  function handleConfirmAndAdvance(value?: string | number) {
+    clearAutoAdvance();
+
+    const updatedAnswers = value !== undefined
+      ? { ...state.answers, [question.id]: value }
+      : { ...state.answers };
+
+    if (value !== undefined) {
+      dispatch({ type: 'SET_ANSWER', key: question.id, value });
     }
+
+    if (state.currentItem === TOTAL_ITEMS - 1) {
+      handleSubmit(updatedAnswers as Record<string, unknown>);
+      return;
+    }
+
+    advanceToNextItem();
+  }
+
+  // ─── Back navigation (BUG-01 fix) ───
+  function handlePrev() {
+    if (state.currentItem <= 0) return;
+    clearAutoAdvance();
+    isNavigatingBack.current = true;
+    slideDirection = -1;
+    dispatch({ type: 'PREV_ITEM' });
+    setTimeout(() => { isNavigatingBack.current = false; }, 50);
   }
 
   async function handleSubmit(answers: Record<string, unknown>) {
@@ -299,30 +365,39 @@ export default function DiagnosticoPage() {
         return (
           <LikertScale7
             value={typeof answerValue === 'number' ? answerValue : null}
-            onChange={(v) => handleAnswer(v)}
+            onChange={(v) => handleLikertAnswer(v)}
           />
         );
       case 'mbi':
         return (
           <MBIScale
             value={typeof answerValue === 'number' ? answerValue : null}
-            onChange={(v) => handleAnswer(v)}
+            onChange={(v) => handleLikertAnswer(v)}
           />
         );
       case 'likert6':
         return (
           <OregScale
             value={typeof answerValue === 'number' ? answerValue : null}
-            onChange={(v) => handleAnswer(v)}
+            onChange={(v) => handleLikertAnswer(v)}
           />
         );
       case 'select':
-      case 'number':
         return (
           <SocioQuestion
             question={question}
-            value={answerValue as string | number | undefined}
-            onChange={(v) => handleAnswer(v)}
+            value={typeof answerValue === 'string' ? answerValue : undefined}
+            onSelect={(v) => handleSelectAnswer(v)}
+            onConfirm={() => handleConfirmAndAdvance()}
+          />
+        );
+      case 'number':
+        return (
+          <NumericInput
+            min={question.validation?.min ?? 0}
+            max={question.validation?.max ?? 999}
+            initialValue={typeof answerValue === 'number' ? answerValue : undefined}
+            onConfirm={(v) => handleConfirmAndAdvance(v)}
           />
         );
     }

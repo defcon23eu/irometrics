@@ -1,4 +1,4 @@
-import type { BlockB, IRORegime, IROResult } from '@/types';
+import type { BlockB, BlockC, IRORegime, IROResult } from '@/types';
 
 // IRO Formula: Re_org = (Σδ · Σv · ΣD) / Σμ
 // Each subscale: 3 items × Likert 1-7 → range [3, 21]
@@ -24,8 +24,11 @@ export function calculateIRO(blockB: BlockB): IROResult {
   const safeMu = Math.max(mu, 1);
   const re_org = (delta * v * D) / safeMu;
 
+  const reOrgRounded = Math.round(re_org * 100) / 100;
+
   return {
-    re_org: Math.round(re_org * 100) / 100,
+    re_org: reOrgRounded,
+    re_org_log: parseFloat(Math.log10(Math.max(reOrgRounded, 0) + 1).toFixed(4)),
     regime: getRegime(re_org),
     delta,
     v,
@@ -93,3 +96,26 @@ export const REGIME_MAP: Record<IRORegime, {
     ],
   },
 };
+
+// ─── MBI-GS Subscales — Gil-Monte (2002) Spanish validation ───
+// Agotamiento: c1-c5 | Cinismo: c6-c9, c16 | Eficacia: c10-c15 (INVERSA)
+export const MBI_GS_SUBSCALES = {
+  agotamiento: ['c1', 'c2', 'c3', 'c4', 'c5'],
+  cinismo: ['c6', 'c7', 'c8', 'c9', 'c16'],
+  eficacia: ['c10', 'c11', 'c12', 'c13', 'c14', 'c15'],
+} as const;
+
+export function calculateMBI(blockC: BlockC) {
+  const agotamiento = MBI_GS_SUBSCALES.agotamiento.reduce(
+    (sum, id) => sum + (blockC[id as keyof BlockC] ?? 0), 0
+  );
+  const cinismo = MBI_GS_SUBSCALES.cinismo.reduce(
+    (sum, id) => sum + (blockC[id as keyof BlockC] ?? 0), 0
+  );
+  // Inverse scoring for Professional Efficacy (Gil-Monte, 2002):
+  // item_score = 6 - response (MBI-GS scale 0–6)
+  const eficacia = MBI_GS_SUBSCALES.eficacia.reduce(
+    (sum, id) => sum + (6 - (blockC[id as keyof BlockC] ?? 0)), 0
+  );
+  return { agotamiento, cinismo, eficacia };
+}

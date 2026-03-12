@@ -8,30 +8,52 @@ import type { IROResult } from '@/types';
 import { REGIME_MAP } from '@/lib/iro-calculator';
 import IROGauge from '@/components/resultado/IROGauge';
 
-function useCountUp(target: number, duration = 1800) {
+// ─── Count-up with easing + reduced-motion ───
+function useCountUp(target: number, duration = 1800, delay = 200) {
   const [value, setValue] = useState(0);
-  const ref = useRef<number>(0);
+  const prefersReduced = useRef(
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
 
   useEffect(() => {
     if (target <= 0) return;
-    const start = performance.now();
-    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+    if (prefersReduced.current) { setValue(target); return; }
 
-    function tick(now: number) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      setValue(+(target * ease(progress)).toFixed(2));
-      if (progress < 1) {
-        ref.current = requestAnimationFrame(tick);
-      }
-    }
+    const startTime = performance.now() + delay;
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+    let raf: number;
 
-    ref.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(ref.current);
-  }, [target, duration]);
+    const tick = (now: number) => {
+      if (now < startTime) { raf = requestAnimationFrame(tick); return; }
+      const elapsed = Math.min((now - startTime) / duration, 1);
+      setValue(+(target * easeOutCubic(elapsed)).toFixed(2));
+      if (elapsed < 1) raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration, delay]);
 
   return value;
 }
+
+// ─── Stagger variants ───
+const PAGE_VARIANTS = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.10, delayChildren: 0.1 } },
+};
+const BLOCK_VARIANTS = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
+};
+const BADGE_VARIANTS = {
+  hidden: { scale: 0.75, opacity: 0 },
+  visible: {
+    scale: 1, opacity: 1,
+    transition: { type: 'spring' as const, stiffness: 280, damping: 18 },
+  },
+};
 
 export default function ResultadoPage() {
   const router = useRouter();
@@ -46,7 +68,9 @@ export default function ResultadoPage() {
       }
       const parsed = JSON.parse(raw) as IROResult;
       setResult(parsed);
-      sessionStorage.clear();
+      // CLEANUP: only remove survey-specific keys, keep consent_at for analytics
+      sessionStorage.removeItem('survey_state');
+      sessionStorage.removeItem('iro_result');
     } catch {
       router.replace('/');
     }
@@ -66,48 +90,45 @@ export default function ResultadoPage() {
   const dateStr = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
 
   return (
-    <main className="min-h-screen px-4 py-16">
+    <motion.main
+      variants={PAGE_VARIANTS}
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen px-4 py-16"
+    >
       <div className="mx-auto max-w-2xl">
         {/* Header */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mb-2 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase"
-        >
-          DIAGNÓSTICO COMPLETADO · {dateStr}
-        </motion.p>
-
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10 text-center text-3xl font-bold sm:text-4xl"
-        >
-          Tu régimen organizacional
-        </motion.h1>
+        <motion.div variants={BLOCK_VARIANTS}>
+          <p className="mb-2 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
+            DIAGNÓSTICO COMPLETADO · {dateStr}
+          </p>
+          <h1 className="mb-10 text-center text-3xl font-bold sm:text-4xl">
+            Tu régimen organizacional
+          </h1>
+        </motion.div>
 
         {/* Gauge */}
-        <IROGauge value={result.re_org} />
+        <motion.div variants={BLOCK_VARIANTS}>
+          <IROGauge value={result.re_org} />
+        </motion.div>
 
         {/* Re_org count-up value */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-4 text-center"
-        >
-          <p className="font-mono text-5xl font-bold sm:text-6xl" style={{ color: regime.color }}>
-            {animatedValue.toFixed(2)}
+        <motion.div variants={BLOCK_VARIANTS} className="mt-4 text-center">
+          <p
+            className="font-mono font-bold"
+            style={{
+              color: regime.color,
+              fontSize: 'clamp(3rem, 12vw, 5.5rem)',
+              lineHeight: 1,
+            }}
+          >
+            {animatedValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <p className="mt-1 font-mono text-sm text-text-muted">Re<sub>org</sub></p>
         </motion.div>
 
-        {/* Regime badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-6 text-center"
-        >
+        {/* Regime badge (spring) */}
+        <motion.div variants={BADGE_VARIANTS} className="mt-6 text-center">
           <span
             className="inline-block rounded-full border px-6 py-2 font-mono text-lg font-bold"
             style={{
@@ -122,9 +143,7 @@ export default function ResultadoPage() {
 
         {/* Technical subscale table */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
+          variants={BLOCK_VARIANTS}
           className="mt-10 overflow-x-auto rounded-xl border border-border-subtle bg-bg-surface"
         >
           <table className="w-full text-left text-sm">
@@ -162,9 +181,7 @@ export default function ResultadoPage() {
 
         {/* Explanation card with regime border */}
         <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5 }}
+          variants={BLOCK_VARIANTS}
           className="mt-10 rounded-xl border border-border-subtle bg-bg-surface p-6"
           style={{ borderLeftWidth: '4px', borderLeftColor: regime.color }}
         >
@@ -183,25 +200,25 @@ export default function ResultadoPage() {
         </motion.section>
 
         {/* Academic footer */}
-        <div className="mt-16 border-t border-border-subtle pt-6 text-center">
+        <motion.div variants={BLOCK_VARIANTS} className="mt-16 border-t border-border-subtle pt-6 text-center">
           <p className="font-mono text-xs tracking-[0.15em] text-text-muted">
             UNED · GRADO EN PSICOLOGÍA · 2025–2026
           </p>
           <p className="mt-2 text-xs text-text-muted">
             Diagnóstico orientativo con fines estadísticos. No constituye diagnóstico clínico ni laboral.
           </p>
-        </div>
+        </motion.div>
 
         {/* Back button */}
-        <div className="mt-8 text-center">
+        <motion.div variants={BLOCK_VARIANTS} className="mt-8 text-center">
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-xl border border-border-subtle px-6 py-3 text-sm text-text-secondary transition-colors duration-150 hover:border-border-focus hover:text-text-primary"
           >
             ← Volver al inicio
           </Link>
-        </div>
+        </motion.div>
       </div>
-    </main>
+    </motion.main>
   );
 }

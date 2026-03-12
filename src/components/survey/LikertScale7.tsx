@@ -10,13 +10,15 @@ interface LikertScale7Props {
   disabled?: boolean;
 }
 
-function CheckIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3.5 8 6.5 11 12.5 5" />
-    </svg>
-  );
-}
+const VALUE_LABELS: Record<number, string> = {
+  1: 'Totalmente en desacuerdo',
+  2: 'En desacuerdo',
+  3: 'Algo en desacuerdo',
+  4: 'Neutral',
+  5: 'Algo de acuerdo',
+  6: 'De acuerdo',
+  7: 'Totalmente de acuerdo',
+};
 
 export default function LikertScale7({
   value,
@@ -26,68 +28,67 @@ export default function LikertScale7({
   disabled = false,
 }: LikertScale7Props) {
   return (
-    <div className="flex flex-col items-center gap-4 w-full max-w-[640px] mx-auto">
-      {/* Labels — top on desktop */}
-      <div className="hidden sm:flex w-full justify-between mb-1">
-        <span className="text-xs text-text-muted max-w-[140px]" id="likert7-left">{leftLabel}</span>
-        <span className="text-xs text-text-muted max-w-[140px] text-right" id="likert7-right">{rightLabel}</span>
+    <div className="w-full space-y-3">
+      {/* Single row: [label-left] [btn1..7] [label-right] */}
+      <div className="flex items-center gap-2 sm:gap-3 w-full">
+        <span className="shrink-0 w-14 sm:w-16 text-right text-[10px] sm:text-xs text-text-muted font-sans leading-tight">
+          {leftLabel}
+        </span>
+
+        <div
+          role="radiogroup"
+          aria-label="Escala de 1 a 7"
+          className="flex flex-1 items-center justify-between gap-0.5 sm:gap-1"
+        >
+          {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => {
+            const isSelected = value === n;
+            return (
+              <motion.button
+                key={n}
+                role="radio"
+                aria-checked={isSelected}
+                aria-label={`${n} — ${VALUE_LABELS[n]}`}
+                disabled={disabled}
+                onClick={() => onChange(n)}
+                whileTap={disabled ? undefined : { scale: 0.92 }}
+                className={`
+                  flex-1 aspect-square rounded-full border-2
+                  flex items-center justify-center
+                  text-xs sm:text-sm font-mono font-medium
+                  transition-all duration-150 min-w-0
+                  ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+                  ${isSelected
+                    ? 'bg-accent-primary border-accent-primary text-white scale-105 shadow-[0_0_16px_#6366F125]'
+                    : 'bg-bg-elevated border-border-subtle text-text-muted hover:border-border-focus hover:text-text-primary hover:bg-bg-elevated/80'
+                  }
+                `}
+                style={{ maxWidth: '44px' }}
+              >
+                {n}
+              </motion.button>
+            );
+          })}
+        </div>
+
+        <span className="shrink-0 w-14 sm:w-16 text-left text-[10px] sm:text-xs text-text-muted font-sans leading-tight">
+          {rightLabel}
+        </span>
       </div>
 
-      {/* Buttons — vertical on mobile, horizontal on desktop */}
-      <div
-        role="radiogroup"
-        aria-label="Escala de 1 a 7"
-        aria-describedby="likert7-left likert7-right"
-        className="flex flex-col sm:flex-row w-full gap-2 sm:gap-2"
-      >
-        {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => {
-          const isSelected = value === n;
-          return (
-            <motion.button
-              key={n}
-              role="radio"
-              aria-checked={isSelected}
-              aria-label={`Opción ${n} de 7`}
-              disabled={disabled}
-              onClick={() => onChange(n)}
-              whileTap={disabled ? undefined : { scale: 0.95 }}
-              whileHover={disabled ? undefined : { scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className={`relative flex items-center justify-center rounded-lg font-semibold
-                w-full h-14 sm:h-[52px] sm:flex-1
-                transition-all duration-150 ease-out
-                ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
-                ${
-                  isSelected
-                    ? 'bg-accent-glow border border-accent-primary text-text-accent shadow-glow'
-                    : 'bg-bg-surface border border-border-default text-text-secondary hover:bg-bg-elevated hover:border-accent-border'
-                }
-              `}
-            >
-              <span className="text-lg">{n}</span>
-              <AnimatePresence>
-                {isSelected && (
-                  <motion.span
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="absolute right-3 text-accent-primary"
-                  >
-                    <CheckIcon />
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* Labels — bottom on mobile */}
-      <div className="flex sm:hidden w-full justify-between">
-        <span className="text-xs text-text-muted max-w-[120px]">{leftLabel}</span>
-        <span className="text-xs text-text-muted max-w-[120px] text-right">{rightLabel}</span>
-      </div>
+      {/* Selection feedback */}
+      <AnimatePresence mode="wait">
+        {value !== null && value !== undefined && (
+          <motion.p
+            key={value}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="text-center text-xs text-accent-primary font-medium h-4"
+          >
+            {VALUE_LABELS[value]}
+          </motion.p>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

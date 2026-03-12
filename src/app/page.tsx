@@ -13,10 +13,10 @@ const fadeUp = {
 };
 
 const REGIMES = [
-  { icon: '◈', name: 'Laminar', range: 'Re < 100', color: 'var(--color-regime-laminar)', desc: 'Flujo estable y predecible. Baja fricción interna.' },
-  { icon: '⧫', name: 'Transición', range: '100 ≤ Re < 800', color: 'var(--color-regime-transicion)', desc: 'Señales de tensión emergente. Momento de intervenir.' },
-  { icon: '■', name: 'Turbulencia incipiente', range: '800 ≤ Re < 1200', color: 'var(--color-regime-incipiente)', desc: 'Inestabilidad visible. Riesgo de desgaste moderado-alto.' },
-  { icon: '▶', name: 'Turbulencia severa', range: 'Re ≥ 1200', color: 'var(--color-regime-severo)', desc: 'Dinámica caótica. Intervención prioritaria.' },
+  { icon: '◈', name: 'Laminar', range: 'Re < 100', color: '#22C55E', bg: '#22C55E0D', border: '#22C55E26', desc: 'Flujo estable y predecible. Baja fricción interna.' },
+  { icon: '⧫', name: 'Transición', range: '100 ≤ Re < 800', color: '#EAB308', bg: '#EAB3080D', border: '#EAB30826', desc: 'Señales de tensión emergente. Momento de intervenir.' },
+  { icon: '■', name: 'Turbulencia incipiente', range: '800 ≤ Re < 1200', color: '#F97316', bg: '#F973160D', border: '#F9731626', desc: 'Inestabilidad visible. Riesgo de desgaste moderado-alto.' },
+  { icon: '▶', name: 'Turbulencia severa', range: 'Re ≥ 1200', color: '#EF4444', bg: '#EF44440D', border: '#EF444426', desc: 'Dinámica caótica. Intervención prioritaria.' },
 ];
 
 const STEPS = [
@@ -76,14 +76,44 @@ export default function HomePage() {
             ¿En qué régimen opera tu organización?
           </motion.h1>
 
-          {/* Equation */}
-          <motion.p
+          {/* Equation — styled formula container */}
+          <motion.div
             variants={fadeUp}
             custom={2}
-            className="mt-6 font-mono text-lg text-accent-primary sm:text-xl"
+            className="my-8 flex flex-col items-center gap-3"
           >
-            Re<sub>org</sub> = (δ · v · D) / μ
-          </motion.p>
+            <div className="w-40 h-px bg-gradient-to-r from-transparent via-border-default to-transparent" />
+
+            <div className="
+              relative group cursor-help
+              px-6 py-3 rounded-lg
+              bg-accent-subtle border border-border-focus/20
+              hover:border-border-focus/40 transition-all duration-300
+            ">
+              {/* Radial glow on hover */}
+              <div className="
+                absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100
+                transition-opacity duration-300 pointer-events-none
+                bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,#6366F112,transparent)]
+              " />
+
+              {/* Formula */}
+              <p className="relative font-mono text-lg sm:text-xl font-medium
+                            text-accent-primary tracking-wide select-none">
+                Re<sub className="text-xs align-sub">org</sub>
+                <span className="text-text-secondary mx-2">=</span>
+                <span className="text-text-primary">(δ · v · D)</span>
+                <span className="text-text-secondary mx-2">/</span>
+                <span className="text-text-primary">μ</span>
+              </p>
+            </div>
+
+            <p className="text-[11px] text-text-muted font-sans tracking-wide uppercase">
+              Índice de Reynolds Organizacional
+            </p>
+
+            <div className="w-40 h-px bg-gradient-to-r from-transparent via-border-default to-transparent" />
+          </motion.div>
 
           {/* Stats */}
           <motion.p
@@ -136,11 +166,15 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
-                className="rounded-xl border border-border-subtle bg-bg-surface p-5 transition-colors duration-150 hover:border-border-focus"
-                style={{ borderLeftWidth: '4px', borderLeftColor: r.color }}
+                className="rounded-xl border border-l-4 p-5 transition-all duration-200 hover:brightness-110"
+                style={{
+                  backgroundColor: r.bg,
+                  borderColor: r.border,
+                  borderLeftColor: r.color,
+                }}
               >
                 <span className="font-mono text-2xl" style={{ color: r.color }}>{r.icon}</span>
-                <h3 className="mt-2 text-base font-semibold">{r.name}</h3>
+                <h3 className="mt-2 text-base font-semibold text-text-primary">{r.name}</h3>
                 <p className="mt-1 font-mono text-xs text-text-muted">{r.range}</p>
                 <p className="mt-2 text-sm text-text-secondary">{r.desc}</p>
               </motion.div>

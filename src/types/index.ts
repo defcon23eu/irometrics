@@ -47,6 +47,7 @@ export type IRORegime = 'laminar' | 'transicion' | 'turbulencia_incipiente' | 't
 
 export interface IROResult {
   re_org: number;
+  re_org_log: number;  // log10(re_org + 1)
   regime: IRORegime;
   delta: number;   // Density index sum
   v: number;       // Change velocity sum
@@ -81,4 +82,5 @@ export interface QuestionDef {
     max?: number;
   };
   blockLabel: string;
+  subscaleLabel?: string;
 }

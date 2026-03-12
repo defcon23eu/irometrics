@@ -101,16 +101,6 @@ export default function IROGauge({ value, maxValue = 2000 }: IROGaugeProps) {
         {/* Center dot */}
         <circle cx={cx} cy={cy} r="6" fill="currentColor" />
       </svg>
-
-      {/* Value */}
-      <motion.p
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="mt-2 text-4xl font-bold sm:text-5xl"
-      >
-        Re = {value.toFixed(2)}
-      </motion.p>
     </div>
   );
 }

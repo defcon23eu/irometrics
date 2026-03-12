@@ -81,48 +81,53 @@ const blockB: QuestionDef[] = [
   { id: 'b12', block: 'B', text: 'Cuando surge un problema, sabemos cómo abordarlo colectivamente.', type: 'likert7', blockLabel: 'Dinámica organizacional' },
 ];
 
-// Block C: MBI-GS (16 items, scale 0-6)
+// Block C: MBI-GS (16 items, scale 0-6) — Gil-Monte (2002) Spanish validation
 const blockC: QuestionDef[] = [
-  // Exhaustion subscale (EX): c1-c5
-  { id: 'c1', block: 'C', text: 'Me siento emocionalmente agotado/a por mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c2', block: 'C', text: 'Me siento agotado/a al final de la jornada laboral.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c3', block: 'C', text: 'Me siento cansado/a cuando me levanto por la mañana y tengo que enfrentarme a otro día de trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c4', block: 'C', text: 'Trabajar todo el día supone realmente un esfuerzo para mí.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c5', block: 'C', text: 'Me siento quemado/a por mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  // Cynicism subscale (CY): c6-c9
-  { id: 'c6', block: 'C', text: 'He ido perdiendo el interés por mi trabajo desde que empecé en este puesto.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c7', block: 'C', text: 'He ido perdiendo el entusiasmo por mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c8', block: 'C', text: 'Solo quiero hacer mi trabajo y que no me molesten.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c9', block: 'C', text: 'Me he vuelto más cínico/a respecto a si mi trabajo vale para algo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  // Professional Efficacy subscale (PE): c10-c15
-  { id: 'c10', block: 'C', text: 'Puedo resolver eficazmente los problemas que surgen en mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c11', block: 'C', text: 'Siento que estoy haciendo una contribución efectiva a mi organización.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c12', block: 'C', text: 'En mi opinión, soy bueno/a en mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c13', block: 'C', text: 'Me siento estimulado/a cuando alcanzo mis objetivos en el trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c14', block: 'C', text: 'He conseguido muchas cosas valiosas en este puesto.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c15', block: 'C', text: 'En mi trabajo, tengo la confianza de que soy eficaz y hago las cosas bien.', type: 'mbi', blockLabel: 'Experiencia laboral' },
-  { id: 'c16', block: 'C', text: 'Dudo de la importancia de mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral' },
+  // Agotamiento emocional (EX): c1-c5
+  { id: 'c1', block: 'C', text: 'Me siento emocionalmente agotado/a por mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Agotamiento emocional' },
+  { id: 'c2', block: 'C', text: 'Me siento agotado/a al final de la jornada laboral.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Agotamiento emocional' },
+  { id: 'c3', block: 'C', text: 'Me siento cansado/a cuando me levanto por la mañana y tengo que enfrentarme a otro día de trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Agotamiento emocional' },
+  { id: 'c4', block: 'C', text: 'Trabajar todo el día supone realmente un esfuerzo para mí.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Agotamiento emocional' },
+  { id: 'c5', block: 'C', text: 'Me siento quemado/a por mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Agotamiento emocional' },
+  // Cinismo (CY): c6-c9, c16 — Gil-Monte (2002)
+  { id: 'c6', block: 'C', text: 'He ido perdiendo el interés por mi trabajo desde que empecé en este puesto.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Cinismo' },
+  { id: 'c7', block: 'C', text: 'He ido perdiendo el entusiasmo por mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Cinismo' },
+  { id: 'c8', block: 'C', text: 'Solo quiero hacer mi trabajo y que no me molesten.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Cinismo' },
+  { id: 'c9', block: 'C', text: 'Me he vuelto más cínico/a respecto a si mi trabajo vale para algo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Cinismo' },
+  // Eficacia profesional (PE): c10-c15 — puntuación INVERSA (6 - respuesta)
+  { id: 'c10', block: 'C', text: 'Puedo resolver eficazmente los problemas que surgen en mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Eficacia profesional' },
+  { id: 'c11', block: 'C', text: 'Siento que estoy haciendo una contribución efectiva a mi organización.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Eficacia profesional' },
+  { id: 'c12', block: 'C', text: 'En mi opinión, soy bueno/a en mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Eficacia profesional' },
+  { id: 'c13', block: 'C', text: 'Me siento estimulado/a cuando alcanzo mis objetivos en el trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Eficacia profesional' },
+  { id: 'c14', block: 'C', text: 'He conseguido muchas cosas valiosas en este puesto.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Eficacia profesional' },
+  { id: 'c15', block: 'C', text: 'En mi trabajo, tengo la confianza de que soy eficaz y hago las cosas bien.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Eficacia profesional' },
+  // c16 → Cinismo (Gil-Monte, 2002)
+  { id: 'c16', block: 'C', text: 'Dudo de la importancia de mi trabajo.', type: 'mbi', blockLabel: 'Experiencia laboral', subscaleLabel: 'Cinismo' },
 ];
 
-// Block D: Oreg RTC (17 items, Likert 1-6)
+// Block D: Oreg RTC (17 items, Likert 1-6) — Oreg et al. (2008) cross-cultural validation
 const blockD: QuestionDef[] = [
-  { id: 'd1', block: 'D', text: 'Generalmente, considero que los cambios son negativos.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd2', block: 'D', text: 'Prefiero un día rutinario a un día lleno de eventos inesperados.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd3', block: 'D', text: 'Me gusta hacer las mismas cosas en vez de probar cosas nuevas y diferentes.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd4', block: 'D', text: 'Siempre que mi vida se vuelve rutinaria, busco formas de cambiarla.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd5', block: 'D', text: 'Prefiero el aburrimiento a la sorpresa.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd6', block: 'D', text: 'Si me informan de un cambio significativo en el trabajo, me siento estresado/a.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd7', block: 'D', text: 'Cuando me obligan a cambiar de planes, me siento tenso/a o estresado/a.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd8', block: 'D', text: 'Cuando las cosas no van según lo planeado, me estreso.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd9', block: 'D', text: 'Si mi jefe/a cambiara los criterios de evaluación, me sentiría incómodo/a.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd10', block: 'D', text: 'No cambio de opinión fácilmente.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd11', block: 'D', text: 'Una vez que he tomado una decisión, no la cambio.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd12', block: 'D', text: 'Mis opiniones son muy consistentes a lo largo del tiempo.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd13', block: 'D', text: 'A menudo cambio de opinión.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd14', block: 'D', text: 'No suelo cambiar fácilmente la forma en que hago las cosas.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd15', block: 'D', text: 'Cuando alguien me presiona para cambiar algo, tiendo a resistirme aunque creo que el cambio puede beneficiarme.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd16', block: 'D', text: 'A veces evito las innovaciones porque me obligan a salir de mi zona de confort.', type: 'likert6', blockLabel: 'Cambio organizacional' },
-  { id: 'd17', block: 'D', text: 'Me resulta difícil adaptarme a situaciones nuevas.', type: 'likert6', blockLabel: 'Cambio organizacional' },
+  // Búsqueda de rutina (RS): d1-d5
+  { id: 'd1', block: 'D', text: 'Generalmente, considero que los cambios son negativos.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Búsqueda de rutina' },
+  { id: 'd2', block: 'D', text: 'Prefiero un día rutinario a un día lleno de eventos inesperados.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Búsqueda de rutina' },
+  { id: 'd3', block: 'D', text: 'Me gusta hacer las mismas cosas en vez de probar cosas nuevas y diferentes.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Búsqueda de rutina' },
+  { id: 'd4', block: 'D', text: 'Siempre que mi vida se vuelve rutinaria, busco formas de cambiarla.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Búsqueda de rutina' },
+  { id: 'd5', block: 'D', text: 'Prefiero el aburrimiento a la sorpresa.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Búsqueda de rutina' },
+  // Reacción emocional (ER): d6-d9
+  { id: 'd6', block: 'D', text: 'Si me informan de un cambio significativo en el trabajo, me siento estresado/a.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Reacción emocional' },
+  { id: 'd7', block: 'D', text: 'Cuando me obligan a cambiar de planes, me siento tenso/a o estresado/a.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Reacción emocional' },
+  { id: 'd8', block: 'D', text: 'Cuando las cosas no van según lo planeado, me estreso.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Reacción emocional' },
+  { id: 'd9', block: 'D', text: 'Si mi jefe/a cambiara los criterios de evaluación, me sentiría incómodo/a.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Reacción emocional' },
+  // Rigidez cognitiva (CR): d10-d13 — Oreg et al. (2008)
+  { id: 'd10', block: 'D', text: 'No cambio de opinión fácilmente.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Rigidez cognitiva' },
+  { id: 'd11', block: 'D', text: 'Una vez que he tomado una decisión, no la cambio.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Rigidez cognitiva' },
+  { id: 'd12', block: 'D', text: 'Mis opiniones son muy consistentes a lo largo del tiempo.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Rigidez cognitiva' },
+  { id: 'd13', block: 'D', text: 'A menudo cambio de opinión.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Rigidez cognitiva' },
+  // Orientación a corto plazo (STF): d14-d17 — Oreg et al. (2008)
+  { id: 'd14', block: 'D', text: 'No suelo cambiar fácilmente la forma en que hago las cosas.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Orientación a corto plazo' },
+  { id: 'd15', block: 'D', text: 'Cuando alguien me presiona para cambiar algo, tiendo a resistirme aunque creo que el cambio puede beneficiarme.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Orientación a corto plazo' },
+  { id: 'd16', block: 'D', text: 'A veces evito las innovaciones porque me obligan a salir de mi zona de confort.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Orientación a corto plazo' },
+  { id: 'd17', block: 'D', text: 'Me resulta difícil adaptarme a situaciones nuevas.', type: 'likert6', blockLabel: 'Cambio organizacional', subscaleLabel: 'Orientación a corto plazo' },
 ];
 
 export const ALL_QUESTIONS: QuestionDef[] = [
