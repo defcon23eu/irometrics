@@ -36,7 +36,11 @@ export function QuestionTransition({
   direction = "forward",
   onSubmit,
 }: QuestionTransitionProps) {
-  const randomStat = EU_OSHA_STATS[Math.floor(Math.random() * EU_OSHA_STATS.length)]
+  // Deterministic stat based on questionId to avoid impure render
+  const statIndex = typeof questionId === 'number' 
+    ? questionId % EU_OSHA_STATS.length 
+    : String(questionId).length % EU_OSHA_STATS.length
+  const randomStat = EU_OSHA_STATS[statIndex]
 
   const handleSubmit = () => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
