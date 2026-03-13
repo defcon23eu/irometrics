@@ -1,6 +1,7 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
+import { motion, useSpring, useTransform } from "framer-motion"
 import type { IRORegime } from "@/types"
 
 interface IROGaugeProps {
@@ -23,6 +24,23 @@ const ZONES = [
 ]
 
 const TICKS = [0, 1000, 2000, 3000, 4000, 5000]
+
+// Animated counter component
+function AnimatedCounter({ value }: { value: number }) {
+  const spring = useSpring(0, { stiffness: 50, damping: 20 })
+  const display = useTransform(spring, (v) => v.toFixed(1))
+  const [displayValue, setDisplayValue] = useState("0.0")
+
+  useEffect(() => {
+    spring.set(value)
+  }, [spring, value])
+
+  useEffect(() => {
+    return display.on("change", (v) => setDisplayValue(v))
+  }, [display])
+
+  return <>{displayValue}</>
+}
 
 export default function IROGauge({ reOrg, regime }: IROGaugeProps) {
   const config = REGIME_CONFIG[regime]
@@ -121,7 +139,7 @@ export default function IROGauge({ reOrg, regime }: IROGaugeProps) {
             className="bg-bg-surface/90 backdrop-blur-sm rounded-lg px-4 py-2 border border-border-subtle"
           >
             <div className="text-xl sm:text-2xl font-mono font-bold text-text-primary">
-              Re<sub className="text-xs">org</sub> = {reOrg.toFixed(1)}
+              Re<sub className="text-xs">org</sub> = <AnimatedCounter value={reOrg} />
             </div>
             <div className="flex items-center justify-center gap-2 mt-1">
               <span className="text-lg">{config.emoji}</span>

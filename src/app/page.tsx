@@ -142,6 +142,17 @@ export default function HomePage() {
           >
             100 % anónimo · Sin registro · Sin cookies
           </motion.p>
+
+          {/* Demo link */}
+          <motion.div variants={fadeUp} custom={6} className="mt-6">
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-accent-primary transition-colors"
+            >
+              <span className="font-mono text-xs px-2 py-0.5 rounded bg-bg-surface border border-border-subtle">DEMO</span>
+              Ver simulación del flujo de preguntas
+            </Link>
+          </motion.div>
         </motion.div>
       </section>
 

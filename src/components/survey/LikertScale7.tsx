@@ -8,6 +8,7 @@ interface LikertScale7Props {
   leftLabel?: string;
   rightLabel?: string;
   disabled?: boolean;
+  compact?: boolean;
 }
 
 const VALUE_LABELS: Record<number, string> = {
@@ -26,7 +27,75 @@ export default function LikertScale7({
   leftLabel = 'Totalmente en desacuerdo',
   rightLabel = 'Totalmente de acuerdo',
   disabled = false,
+  compact = false,
 }: LikertScale7Props) {
+  
+  // Compact mobile-friendly layout
+  if (compact) {
+    return (
+      <div className="w-full space-y-4">
+        {/* Labels on top */}
+        <div className="flex items-center justify-between text-[10px] sm:text-xs text-text-muted font-sans px-1">
+          <span>{leftLabel}</span>
+          <span className="text-right">{rightLabel}</span>
+        </div>
+
+        {/* Desktop: single row, Mobile: 7 buttons in a row with flex-wrap */}
+        <div
+          role="radiogroup"
+          aria-label="Escala de 1 a 7"
+          className="flex flex-wrap justify-center gap-2 sm:gap-3 sm:flex-nowrap"
+        >
+          {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => {
+            const isSelected = value === n;
+            return (
+              <motion.button
+                key={n}
+                role="radio"
+                aria-checked={isSelected}
+                aria-label={`${n} — ${VALUE_LABELS[n]}`}
+                disabled={disabled}
+                onClick={() => onChange(n)}
+                whileTap={disabled ? undefined : { scale: 0.9 }}
+                animate={isSelected ? { scale: [1, 1.15, 1.05] } : { scale: 1 }}
+                transition={isSelected ? { type: 'spring', stiffness: 400, damping: 10 } : undefined}
+                className={`
+                  h-12 w-12 sm:h-14 sm:w-14 rounded-xl border-2
+                  flex items-center justify-center shrink-0
+                  text-base sm:text-lg font-mono font-semibold
+                  transition-colors duration-150
+                  ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer active:scale-95'}
+                  ${isSelected
+                    ? 'bg-accent-primary border-accent-primary text-white shadow-[0_0_20px_#6366F140]'
+                    : 'bg-bg-elevated border-border-subtle text-text-muted hover:border-border-focus hover:text-text-primary hover:bg-bg-surface'
+                  }
+                `}
+              >
+                {n}
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {/* Selection feedback */}
+        <AnimatePresence mode="wait">
+          {value !== null && value !== undefined && (
+            <motion.p
+              key={value}
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="text-center text-sm text-accent-primary font-medium"
+            >
+              {VALUE_LABELS[value]}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
+  // Original layout
   return (
     <div className="w-full space-y-3">
       {/* Single row: [label-left] [btn1..7] [label-right] */}
