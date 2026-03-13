@@ -12,13 +12,23 @@ interface LikertScale7Props {
 }
 
 const VALUE_LABELS: Record<number, string> = {
-  1: 'Totalmente en desacuerdo',
+  1: 'Nada de acuerdo',
   2: 'En desacuerdo',
   3: 'Algo en desacuerdo',
   4: 'Neutral',
   5: 'Algo de acuerdo',
   6: 'De acuerdo',
-  7: 'Totalmente de acuerdo',
+  7: 'Muy de acuerdo',
+};
+
+const VALUE_LABELS_SHORT: Record<number, string> = {
+  1: 'Nada',
+  2: 'No',
+  3: 'Poco',
+  4: 'Neutral',
+  5: 'Algo',
+  6: 'Si',
+  7: 'Mucho',
 };
 
 // Fluid color gradient from laminar (green) to turbulent (red)
@@ -47,27 +57,44 @@ export default function LikertScale7({
   
   if (compact) {
     return (
-      <div className="w-full space-y-5">
-        {/* Fluid flow indicator labels */}
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-regime-laminar" />
-            <span className="text-xs text-text-muted font-sans">{leftLabel}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-text-muted font-sans text-right">{rightLabel}</span>
-            <div className="h-2 w-2 rounded-full bg-regime-severo" />
-          </div>
+      <div className="w-full space-y-4">
+        {/* Flow visualization gradient bar */}
+        <div className="relative">
+          <div className="h-1.5 w-full rounded-full bg-gradient-to-r from-regime-laminar via-regime-transicion to-regime-severo opacity-40" />
+          {/* Progress indicator */}
+          {value !== null && (
+            <motion.div
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-bg-base"
+              style={{ 
+                backgroundColor: getButtonColor(value, true),
+                left: `${((value - 1) / 6) * 100}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              layoutId="likert-indicator"
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            />
+          )}
         </div>
 
-        {/* Flow visualization line */}
-        <div className="relative h-1 w-full rounded-full bg-gradient-to-r from-regime-laminar via-regime-transicion to-regime-severo opacity-30" />
+        {/* Labels row - compact for mobile */}
+        <div className="flex items-center justify-between text-[11px] sm:text-xs text-text-muted px-1">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-regime-laminar" />
+            <span className="hidden sm:inline">{leftLabel}</span>
+            <span className="sm:hidden">Nada</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="hidden sm:inline">{rightLabel}</span>
+            <span className="sm:hidden">Mucho</span>
+            <span className="w-2 h-2 rounded-full bg-regime-severo" />
+          </span>
+        </div>
 
-        {/* Buttons - fluid tap targets */}
+        {/* Buttons - optimized tap targets */}
         <div
           role="radiogroup"
           aria-label="Escala de 1 a 7"
-          className="flex justify-between gap-1.5 sm:gap-2"
+          className="flex justify-center gap-2 sm:gap-3"
         >
           {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => {
             const isSelected = value === n;
@@ -81,72 +108,56 @@ export default function LikertScale7({
                 aria-label={`${n} — ${VALUE_LABELS[n]}`}
                 disabled={disabled}
                 onClick={() => onChange(n)}
-                whileTap={disabled ? undefined : { scale: 0.92 }}
+                whileTap={disabled ? undefined : { scale: 0.9 }}
                 animate={isSelected ? { 
-                  scale: [1, 1.1, 1.05],
+                  scale: 1.1,
                 } : { scale: 1 }}
-                transition={isSelected ? { 
-                  type: 'spring', 
-                  stiffness: 500, 
-                  damping: 15 
-                } : { duration: 0.15 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                 className={`
-                  relative flex-1 min-h-[52px] min-w-[40px] max-w-[56px]
+                  relative h-12 w-12 sm:h-14 sm:w-14
                   rounded-xl border-2
                   flex items-center justify-center
-                  text-base sm:text-lg font-mono font-bold
-                  transition-all duration-200
-                  ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+                  text-lg sm:text-xl font-mono font-bold
+                  transition-colors duration-150
+                  ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer active:scale-95'}
                   ${isSelected
-                    ? 'border-transparent text-bg-base shadow-lg'
-                    : 'bg-bg-elevated/80 border-border-subtle text-text-muted hover:border-border-default hover:text-text-secondary hover:bg-bg-surface'
+                    ? 'border-transparent text-bg-base'
+                    : 'bg-bg-elevated border-border-subtle text-text-muted hover:border-border-default hover:text-text-secondary'
                   }
                 `}
                 style={{
                   backgroundColor: isSelected ? buttonColor : undefined,
-                  boxShadow: isSelected ? `0 0 24px ${buttonColor}50` : undefined,
+                  boxShadow: isSelected ? `0 0 20px ${buttonColor}60, 0 4px 12px ${buttonColor}30` : undefined,
                 }}
               >
                 {n}
-                {/* Ripple effect on selection */}
-                {isSelected && (
-                  <motion.span
-                    className="absolute inset-0 rounded-xl"
-                    initial={{ opacity: 0.6, scale: 1 }}
-                    animate={{ opacity: 0, scale: 1.5 }}
-                    transition={{ duration: 0.5 }}
-                    style={{ backgroundColor: buttonColor }}
-                  />
-                )}
               </motion.button>
             );
           })}
         </div>
 
-        {/* Selection feedback with fluid animation */}
-        <AnimatePresence mode="wait">
-          {value !== null && value !== undefined && (
-            <motion.div
-              key={value}
-              initial={{ opacity: 0, y: -8, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="flex items-center justify-center gap-2 py-1"
-            >
-              <span 
-                className="inline-block h-2 w-2 rounded-full"
-                style={{ backgroundColor: getButtonColor(value, true) }}
-              />
-              <span 
-                className="text-sm font-medium"
-                style={{ color: getButtonColor(value, true) }}
+        {/* Selection feedback */}
+        <div className="h-8 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            {value !== null && value !== undefined && (
+              <motion.div
+                key={value}
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                className="flex items-center gap-2"
               >
-                {VALUE_LABELS[value]}
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <span 
+                  className="text-sm sm:text-base font-medium"
+                  style={{ color: getButtonColor(value, true) }}
+                >
+                  {VALUE_LABELS[value]}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     );
   }

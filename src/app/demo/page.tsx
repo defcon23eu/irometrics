@@ -10,13 +10,13 @@ import { RegimeCard } from '@/components/iro/RegimeCard';
 
 // Sample questions for demo - representative of actual IRO instrument
 const DEMO_QUESTIONS = [
-  { id: 'b1', text: 'Nuestros procesos de trabajo se modifican con mucha frecuencia.', block: 'Dinamica' },
+  { id: 'b1', text: 'Los procesos de trabajo cambian con frecuencia.', block: 'Dinamica' },
   { id: 'b2', text: 'La comunicacion interna es clara y efectiva.', block: 'Comunicacion' },
-  { id: 'b3', text: 'Los cambios organizacionales se implementan de forma planificada.', block: 'Cambio' },
-  { id: 'b4', text: 'Existe incertidumbre sobre la estabilidad de mi puesto de trabajo.', block: 'Estabilidad' },
+  { id: 'b3', text: 'Los cambios se implementan de forma planificada.', block: 'Cambio' },
+  { id: 'b4', text: 'Hay incertidumbre sobre la estabilidad laboral.', block: 'Estabilidad' },
   { id: 'b5', text: 'Los objetivos del equipo cambian constantemente.', block: 'Objetivos' },
-  { id: 'b6', text: 'Tengo autonomia suficiente para realizar mi trabajo.', block: 'Autonomia' },
-  { id: 'b7', text: 'Los conflictos se resuelven de manera constructiva.', block: 'Conflictos' },
+  { id: 'b6', text: 'Tengo autonomia para realizar mi trabajo.', block: 'Autonomia' },
+  { id: 'b7', text: 'Los conflictos se resuelven de forma constructiva.', block: 'Conflictos' },
   { id: 'b8', text: 'La carga de trabajo es predecible y manejable.', block: 'Carga' },
 ];
 
@@ -154,22 +154,22 @@ export default function DemoPage() {
                   {!isTransitioning && (
                     <motion.div
                       key={currentQuestion}
-                      initial={{ opacity: 0, y: 50, scale: 0.96 }}
+                      initial={{ opacity: 0, y: 40, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -50, scale: 0.96 }}
+                      exit={{ opacity: 0, y: -30, scale: 0.98 }}
                       transition={{ 
-                        duration: 0.5, 
-                        ease: [0.16, 1, 0.3, 1],
+                        duration: 0.4, 
+                        ease: [0.25, 0.4, 0.25, 1],
                       }}
-                      className="rounded-2xl border border-border-subtle bg-bg-surface/90 backdrop-blur-sm p-6 sm:p-8"
+                      className="rounded-2xl border border-border-subtle bg-bg-surface/95 backdrop-blur-sm p-5 sm:p-8"
                       style={{
-                        boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+                        boxShadow: '0 4px 24px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.02)',
                       }}
                     >
-                      {/* Question header */}
-                      <div className="mb-6 flex items-center gap-3">
+                      {/* Question header - simplified for mobile */}
+                      <div className="mb-5 sm:mb-6 flex items-center gap-3">
                         <motion.span 
-                          className="flex h-10 w-10 items-center justify-center rounded-xl font-mono text-lg font-bold"
+                          className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl font-mono text-base sm:text-lg font-bold"
                           style={{
                             backgroundColor: 'var(--color-accent-subtle)',
                             color: 'var(--color-accent-primary)',
@@ -183,13 +183,13 @@ export default function DemoPage() {
                         <div className="flex-1">
                           <div className="h-px bg-gradient-to-r from-border-subtle via-border-default to-transparent" />
                         </div>
-                        <span className="text-xs font-mono text-text-muted px-2 py-1 rounded-lg bg-bg-elevated">
+                        <span className="text-[10px] sm:text-xs font-mono text-text-muted px-2 py-1 rounded-lg bg-bg-elevated">
                           {DEMO_QUESTIONS[currentQuestion].block}
                         </span>
                       </div>
 
-                      {/* Question text */}
-                      <h2 className="mb-8 text-lg sm:text-xl font-medium leading-relaxed text-text-primary text-balance">
+                      {/* Question text - better mobile typography */}
+                      <h2 className="mb-6 sm:mb-8 text-base sm:text-xl font-medium leading-relaxed text-text-primary text-balance text-center sm:text-left">
                         {DEMO_QUESTIONS[currentQuestion].text}
                       </h2>
 
@@ -203,7 +203,7 @@ export default function DemoPage() {
 
                       {/* Keyboard hint (desktop only) */}
                       <motion.p 
-                        className="mt-8 hidden text-center text-xs text-text-muted sm:flex items-center justify-center gap-2"
+                        className="mt-6 hidden text-center text-xs text-text-muted sm:flex items-center justify-center gap-2"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 }}

@@ -32,52 +32,56 @@ const scaleIn = {
 const REGIMES = [
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+      <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 sm:w-8 sm:h-8">
         <path d="M4 12h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         <path d="M4 8h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
         <path d="M4 16h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
       </svg>
     ),
-    name: 'Laminar',
+    name: 'Flujo Laminar',
+    shortName: 'Laminar',
     range: 'Re < 100',
     color: '#10B981',
-    desc: 'Flujo estable y predecible. Baja friccion interna. Equipos sincronizados.',
+    desc: 'Operaciones estables y predecibles. Equipos sincronizados con baja friccion.',
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+      <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 sm:w-8 sm:h-8">
         <path d="M4 12c4-2 8 2 12 0s4-2 4-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         <path d="M4 8c4-1 8 1 12 0s4-1 4-1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
         <path d="M4 16c4-1 8 1 12 0s4-1 4-1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
       </svg>
     ),
-    name: 'Transicion',
+    name: 'Zona de Transicion',
+    shortName: 'Transicion',
     range: '100 - 800',
     color: '#FBBF24',
-    desc: 'Senales de tension emergente. Fluctuaciones detectables. Momento de intervenir.',
+    desc: 'Primeras tensiones detectables. Momento optimo para intervenir y prevenir.',
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+      <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 sm:w-8 sm:h-8">
         <path d="M4 12c2-3 4 3 6-2s4 4 6-1 4 2 4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         <path d="M4 7c2-2 4 2 6-1s4 3 6-1 4 1 4 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
         <path d="M4 17c2-2 4 2 6-1s4 3 6-1 4 1 4 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
       </svg>
     ),
-    name: 'Turbulencia Incipiente',
+    name: 'Turbulencia Inicial',
+    shortName: 'T. Inicial',
     range: '800 - 1200',
     color: '#F97316',
-    desc: 'Inestabilidad visible. Riesgo de desgaste moderado-alto. Patrones caoticos.',
+    desc: 'Inestabilidad visible. Riesgo moderado-alto de desgaste profesional.',
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+      <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 sm:w-8 sm:h-8">
         <path d="M4 12c1-4 2 4 4-3s3 5 4-2 3 4 4-2 3 3 4 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         <path d="M4 6c1-3 2 3 4-2s3 4 4-2 3 3 4-1 3 2 4 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
         <path d="M4 18c1-3 2 3 4-2s3 4 4-2 3 3 4-1 3 2 4 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
       </svg>
     ),
-    name: 'Turbulencia Severa',
+    name: 'Turbulencia Critica',
+    shortName: 'T. Critica',
     range: 'Re > 1200',
     color: '#EF4444',
     desc: 'Dinamica caotica. Intervencion prioritaria. Alto riesgo de burnout.',
@@ -356,12 +360,17 @@ export default function HomePage() {
                 />
 
                 <div className="relative">
-                  <div style={{ color: regime.color }}>{regime.icon}</div>
-                  <h3 className="mt-4 text-lg font-semibold text-text-primary">{regime.name}</h3>
-                  <p className="mt-1 font-mono text-sm" style={{ color: regime.color }}>
-                    {regime.range}
-                  </p>
-                  <p className="mt-3 text-sm text-text-secondary leading-relaxed">
+                  <div className="flex items-center justify-between">
+                    <div style={{ color: regime.color }}>{regime.icon}</div>
+                    <span className="font-mono text-xs px-2 py-1 rounded-lg bg-bg-elevated" style={{ color: regime.color }}>
+                      {regime.range}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-base sm:text-lg font-semibold text-text-primary">
+                    <span className="hidden sm:inline">{regime.name}</span>
+                    <span className="sm:hidden">{regime.shortName}</span>
+                  </h3>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
                     {regime.desc}
                   </p>
                 </div>
