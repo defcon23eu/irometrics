@@ -110,7 +110,7 @@ export default function ResultadoPage() {
 
         {/* Gauge */}
         <motion.div variants={BLOCK_VARIANTS}>
-          <IROGauge value={result.re_org} />
+          <IROGauge reOrg={result.re_org} regime={result.regime} />
         </motion.div>
 
         {/* Re_org count-up value */}
