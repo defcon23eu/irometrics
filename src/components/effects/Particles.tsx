@@ -38,7 +38,7 @@ export default function Particles({ count = 20, className }: ParticlesProps) {
         return (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-accent-primary/40"
+            className="absolute w-1 h-1 rounded-full bg-accent-primary/60"
             style={{ top: `${top}%`, left: `${left}%` }}
             animate={{ y: [0, -30, 0], opacity: [0.2, 0.6, 0.2] }}
             transition={{ duration, repeat: Infinity, ease: "easeInOut", delay }}

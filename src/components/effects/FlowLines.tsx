@@ -32,7 +32,7 @@ export default function FlowLines({ lines = 5, className }: FlowLinesProps) {
       {Array.from({ length: effectiveLines }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute h-px bg-gradient-to-r from-transparent via-accent-primary/30 to-transparent"
+          className="absolute h-px bg-gradient-to-r from-transparent via-accent-primary/50 to-transparent"
           style={{ top: `${20 + i * 15}%`, width: "100%" }}
           animate={{ x: ["-100%", "100%"] }}
           transition={{

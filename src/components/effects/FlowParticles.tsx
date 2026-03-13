@@ -45,12 +45,11 @@ export default function FlowParticles({ color, intensity, className }: FlowParti
               height: size,
               backgroundColor: color,
               left: `${left}%`,
-              opacity: 0.4 + normalizedIntensity * 0.3,
             }}
             initial={{ top: "100%", opacity: 0 }}
             animate={{
               top: "-10%",
-              opacity: [0, 0.6, 0],
+              opacity: [0, 0.7 + normalizedIntensity * 0.25, 0],
               x: drift === 0 ? 0 : [0, drift, 0],
             }}
             transition={{

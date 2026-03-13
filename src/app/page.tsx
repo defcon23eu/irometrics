@@ -52,8 +52,8 @@ export default function HomePage() {
         />
         {/* Radial glow */}
         <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-primary/8 blur-3xl" />
-        <Particles count={12} className="opacity-20 sm:opacity-45" />
-        <FlowLines lines={4} className="opacity-15 sm:opacity-35" />
+        <Particles count={12} />
+        <FlowLines lines={4} />
 
         <motion.div
           className="relative z-10 max-w-3xl text-center"

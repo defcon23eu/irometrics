@@ -118,7 +118,6 @@ export default function ResultadoPage() {
           <FlowParticles
             color={regime.color}
             intensity={Math.min(result.re_org / 1200, 1)}
-            className="opacity-18 sm:opacity-35"
           />
           <div className="relative z-10">
             <IROGauge reOrg={result.re_org} regime={result.regime} />
