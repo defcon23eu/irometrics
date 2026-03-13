@@ -79,61 +79,6 @@ const INSTRUMENTS = [
   { block: 'D', name: 'Oreg RTC', items: 17, scale: '1-6' },
 ];
 
-// Flow lines background component
-function FlowLines() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(5)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute h-px bg-gradient-to-r from-transparent via-accent-primary/30 to-transparent"
-          style={{
-            top: `${20 + i * 15}%`,
-            width: '100%',
-          }}
-          animate={{
-            x: ['-100%', '100%'],
-          }}
-          transition={{
-            duration: 8 + i * 2,
-            repeat: Infinity,
-            ease: 'linear',
-            delay: i * 0.5,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// Floating particles
-function Particles() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-accent-primary/40"
-          style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, -30, 0],
-            opacity: [0.2, 0.6, 0.2],
-          }}
-          transition={{
-            duration: 3 + Math.random() * 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: Math.random() * 2,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 export default function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
