@@ -12,6 +12,11 @@ const fadeUp = {
   }),
 };
 
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
 const REGIMES = [
   { icon: '◈', name: 'Laminar', range: 'Re < 100', color: '#22C55E', bg: '#22C55E0D', border: '#22C55E26', desc: 'Flujo estable y predecible. Baja fricción interna.' },
   { icon: '⧫', name: 'Transición', range: '100 ≤ Re < 800', color: '#EAB308', bg: '#EAB3080D', border: '#EAB30826', desc: 'Señales de tensión emergente. Momento de intervenir.' },
@@ -56,7 +61,7 @@ export default function HomePage() {
           className="relative z-10 max-w-3xl text-center"
           initial="hidden"
           animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+          variants={stagger}
         >
           {/* Badge */}
           <motion.p
