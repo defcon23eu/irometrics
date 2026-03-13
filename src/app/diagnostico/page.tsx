@@ -11,7 +11,6 @@ import MBIScale from '@/components/survey/MBIScale';
 import OregScale from '@/components/survey/OregScale';
 import SocioQuestion from '@/components/survey/SocioQuestion';
 import NumericInput from '@/components/survey/NumericInput';
-import { ProgressSpectrum } from '@/components/iro';
 
 // Block metadata for defcon23-style headers
 const BLOCK_META: Record<string, { num: string; label: string; icon: string }> = {
@@ -398,41 +397,46 @@ export default function DiagnosticoPage() {
 
   return (
     <main className="flex min-h-screen flex-col px-4 py-8">
-      {/* Global IRO progress spectrum */}
+      {/* 4-block phase progress — shows % per phase, not "X of 50" */}
       <div className="mx-auto mb-6 w-full max-w-xl">
-        <ProgressSpectrum
-          currentStep={state.currentItem + 1}
-          totalSteps={TOTAL_ITEMS}
-        />
-      </div>
-
-      {/* Block header + progress */}
-      <div className="mx-auto w-full max-w-xl">
-        {/* Block label */}
-        <div className="mb-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs tracking-[0.15em] text-text-muted">
-              BLOQUE {blockMeta.num}
-            </span>
-            <span className="font-mono text-xs text-text-muted">{blockMeta.icon}</span>
-          </div>
-          <span className="rounded-full bg-bg-surface px-3 py-0.5 font-mono text-xs text-text-secondary">
-            {blockProgress.pct}% · Bloque {getBlockIndex(question.block)}/4
-          </span>
+        <div className="flex w-full gap-3">
+          {(['A', 'B', 'C', 'D'] as const).map((block) => {
+            const meta = BLOCK_META[block];
+            const blockOrder = ['A', 'B', 'C', 'D'];
+            const isCompleted = blockOrder.indexOf(question.block) > blockOrder.indexOf(block);
+            const isActive = question.block === block;
+            const pct = isCompleted ? 100 : isActive ? blockProgress.pct : 0;
+            return (
+              <div key={block} className="flex-1">
+                <div className="mb-1 flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-text-muted">{meta.icon}</span>
+                  <span className={`font-mono text-[10px] ${
+                    isCompleted ? 'text-[var(--color-regime-laminar)]' : isActive ? 'text-accent-primary' : 'text-text-muted'
+                  }`}>
+                    {isCompleted ? '✓' : isActive ? `${pct}%` : '—'}
+                  </span>
+                </div>
+                <div className="h-1 w-full overflow-hidden rounded-full bg-bg-elevated">
+                  <motion.div
+                    className="h-full rounded-full"
+                    animate={{ width: `${pct}%` }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                    style={{
+                      backgroundColor: isCompleted
+                        ? 'var(--color-regime-laminar)'
+                        : isActive
+                          ? 'var(--color-accent-primary)'
+                          : 'transparent',
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
-
-        <p className="mb-3 text-sm font-medium text-text-secondary">
-          {blockMeta.label}
+        <p className="mt-2 text-center font-mono text-[10px] text-text-muted">
+          {blockMeta.icon} {blockMeta.label}
         </p>
-
-        {/* Block progress bar */}
-        <div className="h-1 w-full overflow-hidden rounded-full bg-bg-elevated">
-          <motion.div
-            className="h-full rounded-full bg-accent-primary"
-            animate={{ width: `${blockProgress.pct}%` }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-          />
-        </div>
       </div>
 
       {/* Question area */}

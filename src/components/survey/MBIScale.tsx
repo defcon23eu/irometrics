@@ -21,50 +21,48 @@ const VALUE_LABELS: Record<number, string> = {
 export default function MBIScale({ value, onChange, disabled = false }: MBIScaleProps) {
   return (
     <div className="w-full space-y-3">
-      {/* Single row: [label-left] [btn0..6] [label-right] */}
-      <div className="flex items-center gap-2 sm:gap-3 w-full">
-        <span className="shrink-0 w-14 sm:w-16 text-right text-[10px] sm:text-xs text-text-muted font-sans leading-tight">
-          Nunca
-        </span>
+      {/* Labels above */}
+      <div className="flex justify-between px-0.5 text-[10px] leading-tight text-text-muted sm:text-xs">
+        <span>Nunca</span>
+        <span>Siempre</span>
+      </div>
 
-        <div
-          role="radiogroup"
-          aria-label="Escala de frecuencia de 0 a 6"
-          className="flex flex-1 items-center justify-between gap-0.5 sm:gap-1"
-        >
-          {Array.from({ length: 7 }, (_, i) => i).map((n) => {
-            const isSelected = value === n;
-            return (
-              <motion.button
-                key={n}
-                role="radio"
-                aria-checked={isSelected}
-                aria-label={`${n} — ${VALUE_LABELS[n]}`}
-                disabled={disabled}
-                onClick={() => onChange(n)}
-                whileTap={disabled ? undefined : { scale: 0.92 }}
-                className={`
-                  flex-1 aspect-square rounded-full border-2
-                  flex items-center justify-center
-                  text-xs sm:text-sm font-mono font-medium
-                  transition-all duration-150 min-w-0
-                  ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
-                  ${isSelected
-                    ? 'bg-accent-primary border-accent-primary text-white scale-105 shadow-[0_0_16px_#6366F125]'
-                    : 'bg-bg-elevated border-border-subtle text-text-muted hover:border-border-focus hover:text-text-primary hover:bg-bg-elevated/80'
-                  }
-                `}
-                style={{ maxWidth: '44px' }}
-              >
-                {n}
-              </motion.button>
-            );
-          })}
-        </div>
-
-        <span className="shrink-0 w-14 sm:w-16 text-left text-[10px] sm:text-xs text-text-muted font-sans leading-tight">
-          Siempre
-        </span>
+      {/* Buttons row — full width */}
+      <div
+        role="radiogroup"
+        aria-label="Escala de frecuencia de 0 a 6"
+        className="flex w-full items-center gap-1.5 sm:gap-2"
+      >
+        {Array.from({ length: 7 }, (_, i) => i).map((n) => {
+          const isSelected = value === n;
+          return (
+            <motion.button
+              key={n}
+              role="radio"
+              aria-checked={isSelected}
+              aria-label={`${n} — ${VALUE_LABELS[n]}`}
+              disabled={disabled}
+              onClick={() => onChange(n)}
+              whileTap={disabled ? undefined : { scale: 0.88 }}
+              animate={isSelected ? { scale: 1.12 } : { scale: 1 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              className={`
+                flex-1 aspect-square rounded-full border-2
+                flex items-center justify-center
+                text-sm font-mono font-semibold
+                min-h-[44px]
+                transition-colors duration-150
+                ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+                ${isSelected
+                  ? 'bg-accent-primary border-accent-primary text-white shadow-[0_0_24px_#6366F170]'
+                  : 'bg-bg-elevated border-border-subtle text-text-secondary hover:border-border-focus hover:text-text-primary'
+                }
+              `}
+            >
+              {n}
+            </motion.button>
+          );
+        })}
       </div>
 
       {/* Selection feedback */}

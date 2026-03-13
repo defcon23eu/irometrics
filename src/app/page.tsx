@@ -161,7 +161,7 @@ export default function HomePage() {
             El Índice de Reynolds Organizacional clasifica la dinámica de tu equipo en un espectro continuo — del orden al caos.
           </p>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {REGIMES.map((r, i) => (
               <motion.div
                 key={r.name}
@@ -169,43 +169,17 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
-                className="rounded-xl border border-l-4 p-5 transition-all duration-200 hover:brightness-110"
-                style={{
-                  backgroundColor: r.bg,
-                  borderColor: r.border,
-                  borderLeftColor: r.color,
-                }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="relative overflow-hidden rounded-2xl border p-5"
+                style={{ backgroundColor: r.bg, borderColor: r.border }}
               >
-                <span className="font-mono text-2xl" style={{ color: r.color }}>{r.icon}</span>
-                <h3 className="mt-2 text-base font-semibold text-text-primary">{r.name}</h3>
-                <p className="mt-1 font-mono text-xs text-text-muted">{r.range}</p>
-                <p className="mt-2 text-sm text-text-secondary">{r.desc}</p>
+                <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ backgroundColor: r.color }} />
+                <span className="font-mono text-3xl leading-none" style={{ color: r.color }}>{r.icon}</span>
+                <h3 className="mt-3 text-base font-semibold text-text-primary">{r.name}</h3>
+                <p className="mt-1 font-mono text-xs font-medium" style={{ color: r.color + 'BB' }}>{r.range}</p>
+                <p className="mt-2 text-sm leading-relaxed text-text-secondary">{r.desc}</p>
               </motion.div>
             ))}
-          </div>
-
-          {/* Regime table */}
-          <div className="mt-8 overflow-x-auto rounded-xl border border-border-subtle bg-bg-surface">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-border-subtle text-xs uppercase tracking-wider text-text-muted">
-                  <th className="px-5 py-3 font-mono font-medium">Re<sub>org</sub></th>
-                  <th className="px-5 py-3 font-medium">Régimen</th>
-                  <th className="hidden px-5 py-3 font-medium sm:table-cell">Descripción</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {REGIMES.map((r) => (
-                  <tr key={r.name}>
-                    <td className="whitespace-nowrap px-5 py-3 font-mono text-text-secondary">{r.range}</td>
-                    <td className="px-5 py-3 font-semibold" style={{ color: r.color }}>
-                      <span className="mr-1.5">{r.icon}</span>{r.name}
-                    </td>
-                    <td className="hidden px-5 py-3 text-text-secondary sm:table-cell">{r.desc}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </div>
       </section>
