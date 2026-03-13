@@ -4,7 +4,7 @@ import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { SurveyState, SurveyAction, BlockB } from '@/types';
-import { ALL_QUESTIONS, TOTAL_ITEMS, BLOCK_TRANSITIONS, BLOCK_RANGES } from '@/lib/questions';
+import { ALL_QUESTIONS, TOTAL_ITEMS, BLOCK_RANGES } from '@/lib/questions';
 import { calculateIRO } from '@/lib/iro-calculator';
 import LikertScale7 from '@/components/survey/LikertScale7';
 import MBIScale from '@/components/survey/MBIScale';
@@ -127,20 +127,6 @@ export default function DiagnosticoPage() {
 
   // Cleanup on unmount
   useEffect(() => () => clearAutoAdvance(), []);
-
-  const getBlockTransitionMessage = useCallback(
-    (fromIdx: number): string | null => {
-      if (fromIdx >= TOTAL_ITEMS - 1) return null;
-      const currentBlock = ALL_QUESTIONS[fromIdx].block;
-      const nextBlock = ALL_QUESTIONS[fromIdx + 1].block;
-      if (currentBlock !== nextBlock) {
-        const key = `${currentBlock}_${nextBlock}`;
-        return BLOCK_TRANSITIONS[key] ?? null;
-      }
-      return null;
-    },
-    [],
-  );
 
   const getBlockTransitionKey = useCallback(
     (fromIdx: number): string | null => {

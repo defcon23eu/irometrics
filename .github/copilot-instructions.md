@@ -127,3 +127,45 @@ supabase/migrations/         ← migraciones SQL ordenadas (001, 002...)
 - `safeMu = Math.max(mu, 3)` — mínimo teórico real (3 ítems × Likert 1), **nunca usar 1**.
 - `re_org_log = Math.log10(re_org + 1)` — **SIEMPRE persistir en Supabase** en cada insert.
 - Prevención división por cero: `Math.max(reOrgRounded, 0) + 1` antes de log10.
+
+## SISTEMA DE ANIMACIONES Y EFECTOS
+
+### Tokens visuales (tema índigo)
+- Acento principal: `#6366F1`
+- Regímenes: laminar `#22C55E`, transición `#EAB308`, incipiente `#F97316`, severo `#EF4444`
+
+### Variantes Framer Motion recomendadas
+- `fadeIn`, `scaleIn`, `staggerContainer`
+- Hover cards (`whileHover={{ y: -4 }}`)
+- Botones con spring (`type: 'spring'`, `stiffness: 400`, `damping: 20`)
+
+### Componentes de efectos reutilizables
+- `FlowLines`
+- `Particles`
+- `FlowParticles`
+- `AnimatedCounter`
+
+### Patrones avanzados permitidos
+- Parallax con `useScroll` + `useTransform`
+- Likert con gradiente de color por intensidad
+- ProgressBar fluido con indicador animado
+- Gauge SVG con aguja animada por spring
+
+### Utilities CSS
+- `.glass`
+- `.btn-fluid`
+- `.gauge-glow`
+- `.flow-line`
+
+### Keyframes mínimos
+- `fade-in`
+- `shimmer`
+- `pulse-glow`
+- `float`
+- `flow-lines`
+
+### Buenas prácticas de motion
+- Priorizar spring en interacciones
+- Easing suave para entradas (`[0.25, 0.4, 0.25, 1]`)
+- Stagger en listas y grids (`0.08–0.12`)
+- Respetar `prefers-reduced-motion`

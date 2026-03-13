@@ -20,6 +20,19 @@ const VALUE_LABELS: Record<number, string> = {
   7: 'Totalmente de acuerdo',
 };
 
+function getButtonColor(n: number): string {
+  const colors = [
+    'var(--color-regime-laminar)',
+    'var(--color-regime-laminar)',
+    '#6EE7B7',
+    'var(--color-regime-transicion)',
+    'var(--color-regime-incipiente)',
+    'var(--color-regime-incipiente)',
+    'var(--color-regime-severo)',
+  ];
+  return colors[n - 1];
+}
+
 export default function LikertScale7({
   value,
   onChange,
@@ -42,6 +55,7 @@ export default function LikertScale7({
         >
           {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => {
             const isSelected = value === n;
+            const buttonColor = getButtonColor(n);
             return (
               <motion.button
                 key={n}
@@ -51,6 +65,8 @@ export default function LikertScale7({
                 disabled={disabled}
                 onClick={() => onChange(n)}
                 whileTap={disabled ? undefined : { scale: 0.92 }}
+                animate={isSelected ? { scale: 1.08 } : { scale: 1 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                 className={`
                   flex-1 aspect-square rounded-full border-2
                   flex items-center justify-center
@@ -58,11 +74,20 @@ export default function LikertScale7({
                   transition-all duration-150 min-w-0
                   ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                   ${isSelected
-                    ? 'bg-accent-primary border-accent-primary text-white scale-105 shadow-[0_0_16px_#6366F125]'
+                    ? 'text-white'
                     : 'bg-bg-elevated border-border-subtle text-text-muted hover:border-border-focus hover:text-text-primary hover:bg-bg-elevated/80'
                   }
                 `}
-                style={{ maxWidth: '44px' }}
+                style={{
+                  maxWidth: '44px',
+                  ...(isSelected
+                    ? {
+                        backgroundColor: buttonColor,
+                        borderColor: buttonColor,
+                        boxShadow: `0 0 20px ${buttonColor}60`,
+                      }
+                    : {}),
+                }}
               >
                 {n}
               </motion.button>

@@ -8,6 +8,7 @@ import type { IROResult } from '@/types';
 import { REGIME_MAP } from '@/lib/iro-calculator';
 import IROGauge from '@/components/resultado/IROGauge';
 import { RegimeCard } from '@/components/iro';
+import { FlowParticles } from '@/components/effects';
 
 // ─── Count-up with easing + reduced-motion ───
 function useCountUp(target: number, duration = 1800, delay = 200) {
@@ -19,7 +20,10 @@ function useCountUp(target: number, duration = 1800, delay = 200) {
 
   useEffect(() => {
     if (target <= 0) return;
-    if (prefersReduced.current) { setValue(target); return; }
+    if (prefersReduced.current) {
+      const rafImmediate = requestAnimationFrame(() => setValue(target));
+      return () => cancelAnimationFrame(rafImmediate);
+    }
 
     const startTime = performance.now() + delay;
     const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -68,10 +72,11 @@ export default function ResultadoPage() {
         return;
       }
       const parsed = JSON.parse(raw) as IROResult;
-      setResult(parsed);
+      const rafParsed = requestAnimationFrame(() => setResult(parsed));
       // CLEANUP: only remove survey-specific keys, keep consent_at for analytics
       sessionStorage.removeItem('survey_state');
       sessionStorage.removeItem('iro_result');
+      return () => cancelAnimationFrame(rafParsed);
     } catch {
       router.replace('/');
     }
@@ -109,8 +114,15 @@ export default function ResultadoPage() {
         </motion.div>
 
         {/* Gauge */}
-        <motion.div variants={BLOCK_VARIANTS}>
-          <IROGauge reOrg={result.re_org} regime={result.regime} />
+        <motion.div variants={BLOCK_VARIANTS} className="relative isolate overflow-hidden rounded-2xl">
+          <FlowParticles
+            color={regime.color}
+            intensity={Math.min(result.re_org / 1200, 1)}
+            className="opacity-18 sm:opacity-35"
+          />
+          <div className="relative z-10">
+            <IROGauge reOrg={result.re_org} regime={result.regime} />
+          </div>
         </motion.div>
 
         {/* Re_org count-up value */}

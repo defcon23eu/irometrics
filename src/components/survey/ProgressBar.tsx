@@ -1,5 +1,7 @@
 'use client';
 
+import { motion } from 'framer-motion';
+
 interface ProgressBarProps {
   current: number; // 1-50
   total: number;   // 50
@@ -19,15 +21,21 @@ export default function ProgressBar({ current, total, blockLabel }: ProgressBarP
           {blockLabel}
         </span>
       </div>
-      <div className="h-1 w-full overflow-hidden rounded-full bg-bg-elevated">
-        <div
-          className="h-full rounded-full transition-all duration-300 ease-out"
+      <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated/60">
+        <motion.div
+          className="absolute inset-y-0 left-0 rounded-full"
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
           style={{
-            width: `${pct}%`,
-            background: 'linear-gradient(90deg, var(--color-regime-laminar), var(--color-regime-transicion), var(--color-regime-incipiente), var(--color-regime-severo))',
-            backgroundSize: '400% 100%',
-            backgroundPosition: `${pct}% 0`,
+            background: 'linear-gradient(90deg, var(--color-regime-laminar) 0%, var(--color-regime-transicion) 50%, var(--color-accent-primary) 100%)',
           }}
+        />
+        <motion.div
+          className="absolute top-1/2 -translate-y-1/2 h-3 w-3 rounded-full border-2 border-bg-base"
+          animate={{ left: `calc(${pct}% - 6px)` }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+          style={{ backgroundColor: 'var(--color-accent-primary)' }}
         />
       </div>
     </div>
