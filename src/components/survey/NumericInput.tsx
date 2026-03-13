@@ -16,10 +16,30 @@ export default function NumericInput({
 }: NumericInputProps) {
   const [raw, setRaw] = useState<string>(initialValue?.toString() ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
+  const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const parsed = raw === '' ? null : parseInt(raw, 10);
   const isValid = parsed !== null && !isNaN(parsed) && parsed >= min && parsed <= max;
 
   useEffect(() => { inputRef.current?.focus(); }, []);
+
+  useEffect(() => {
+    if (autoAdvanceRef.current) {
+      clearTimeout(autoAdvanceRef.current);
+      autoAdvanceRef.current = null;
+    }
+
+    if (isValid && parsed !== null) {
+      autoAdvanceRef.current = setTimeout(() => {
+        onConfirm(parsed);
+      }, 550);
+    }
+
+    return () => {
+      if (autoAdvanceRef.current) {
+        clearTimeout(autoAdvanceRef.current);
+      }
+    };
+  }, [isValid, parsed, onConfirm]);
 
   const handleConfirm = () => {
     if (isValid && parsed !== null) onConfirm(parsed);
@@ -73,18 +93,15 @@ export default function NumericInput({
         </p>
       )}
 
-      <button
-        onClick={handleConfirm}
-        disabled={!isValid}
-        className="
-          w-full py-3.5 rounded-lg font-medium text-sm
-          bg-accent-primary hover:bg-accent-hover
-          disabled:opacity-25 disabled:cursor-not-allowed
-          text-white transition-all duration-150 active:scale-[0.98]
-        "
+      <div
+        className={`w-full rounded-lg border px-3 py-2 text-center text-xs font-mono transition-colors duration-150 ${
+          isValid
+            ? 'border-accent-primary/40 text-accent-primary'
+            : 'border-border-subtle text-text-muted'
+        }`}
       >
-        Confirmar →
-      </button>
+        {isValid ? 'Valor válido · continuando…' : 'Introduce un valor válido para continuar'}
+      </div>
 
       <p className="text-xs text-text-muted font-mono">
         Rango: {min} – {max}{unit ? ` ${unit}` : ''}

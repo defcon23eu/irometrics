@@ -396,9 +396,9 @@ export default function DiagnosticoPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col px-4 py-8">
+    <main className="flex min-h-screen flex-col px-4 py-6 sm:py-8">
       {/* 4-block phase progress — shows % per phase, not "X of 50" */}
-      <div className="mx-auto mb-6 w-full max-w-xl">
+      <div className="mx-auto mb-4 w-full max-w-xl sm:mb-6">
         <div className="flex w-full gap-3">
           {(['A', 'B', 'C', 'D'] as const).map((block) => {
             const meta = BLOCK_META[block];
@@ -434,7 +434,7 @@ export default function DiagnosticoPage() {
             );
           })}
         </div>
-        <p className="mt-2 text-center font-mono text-[10px] text-text-muted">
+        <p className="mt-2 text-center font-mono text-[10px] tracking-wide text-text-muted">
           {blockMeta.icon} {blockMeta.label}
         </p>
       </div>
@@ -450,9 +450,9 @@ export default function DiagnosticoPage() {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="rounded-2xl border border-border-subtle bg-bg-elevated/50 p-6 sm:p-8"
+              className="rounded-2xl border border-border-subtle bg-bg-elevated/60 p-5 sm:p-8"
             >
-              <h2 className="mb-8 text-center text-lg font-semibold leading-relaxed sm:text-xl">
+              <h2 className="mb-6 text-center text-base font-semibold leading-relaxed sm:mb-8 sm:text-xl">
                 {question.text}
               </h2>
               {renderInput()}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { QuestionDef } from '@/types';
 
@@ -19,6 +20,26 @@ function CheckIcon() {
 }
 
 export default function SocioQuestion({ question, value, onSelect, onConfirm }: SocioQuestionProps) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  function handleOptionClick(optValue: string) {
+    // Cancel any pending auto-advance (user changed their mind)
+    if (timerRef.current) clearTimeout(timerRef.current);
+    onSelect(optValue);
+    // Auto-advance after 600ms — enough to see selection animate, fast enough to feel fluid
+    timerRef.current = setTimeout(() => {
+      onConfirm();
+    }, 600);
+  }
+
   if (!question.options) return null;
 
   return (
@@ -28,7 +49,7 @@ export default function SocioQuestion({ question, value, onSelect, onConfirm }: 
         return (
           <motion.button
             key={opt.value}
-            onClick={() => onSelect(opt.value)}
+            onClick={() => handleOptionClick(opt.value)}
             whileTap={{ scale: 0.97 }}
             whileHover={{ scale: 1.01 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -57,23 +78,6 @@ export default function SocioQuestion({ question, value, onSelect, onConfirm }: 
           </motion.button>
         );
       })}
-
-      {/* Explicit advance button — no auto-advance for selects */}
-      <AnimatePresence>
-        {value && (
-          <motion.button
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            onClick={onConfirm}
-            className="mt-2 w-full py-3.5 rounded-lg font-medium text-sm
-              bg-accent-primary hover:bg-accent-hover
-              text-white transition-all duration-150 active:scale-[0.98]"
-          >
-            Siguiente →
-          </motion.button>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

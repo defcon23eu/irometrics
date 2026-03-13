@@ -35,25 +35,25 @@ const INSTRUMENT = [
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen">
-      {/* ===== HERO ===== */}
-      <section
-        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4"
-        style={{ background: 'linear-gradient(180deg, var(--color-bg-base) 0%, var(--color-bg-surface) 100%)' }}
-      >
-        {/* Grid background */}
+    <div className="relative overflow-x-hidden">
+      {/* ===== GLOBAL BACKGROUND — fixed, visible throughout full scroll ===== */}
+      <div aria-hidden className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div
-          className="pointer-events-none absolute inset-0"
+          className="absolute inset-0"
           style={{
             backgroundImage:
               'linear-gradient(var(--color-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
-        {/* Radial glow */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-primary/8 blur-3xl" />
-        <Particles count={12} />
-        <FlowLines lines={4} />
+        <div className="absolute top-0 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-accent-primary/6 blur-3xl" />
+        <Particles count={16} />
+        <FlowLines lines={5} />
+      </div>
+
+      <main className="relative z-10 min-h-screen">
+      {/* ===== HERO ===== */}
+      <section className="flex min-h-screen flex-col items-center justify-center px-4">
 
         <motion.div
           className="relative z-10 max-w-3xl text-center"
@@ -74,7 +74,7 @@ export default function HomePage() {
           <motion.h1
             variants={fadeUp}
             custom={1}
-            className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl"
+            className="text-3xl font-bold leading-[1.15] tracking-tight sm:text-5xl md:text-6xl"
           >
             ¿En qué régimen opera tu organización?
           </motion.h1>
@@ -131,7 +131,7 @@ export default function HomePage() {
           <motion.div variants={fadeUp} custom={4} className="mt-10">
             <Link
               href="/consentimiento"
-              className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+              className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-base sm:text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
             >
               Iniciar diagnóstico →
             </Link>
@@ -149,7 +149,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== RÉGIMEN ===== */}
-      <section className="px-4 py-20">
+      <section className="px-4 py-16">
         <div className="mx-auto max-w-5xl">
           <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
             RÉGIMEN
@@ -175,9 +175,9 @@ export default function HomePage() {
               >
                 <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ backgroundColor: r.color }} />
                 <span className="font-mono text-3xl leading-none" style={{ color: r.color }}>{r.icon}</span>
-                <h3 className="mt-3 text-base font-semibold text-text-primary">{r.name}</h3>
+                <h3 className="mt-3 text-base sm:text-lg font-semibold text-text-primary">{r.name}</h3>
                 <p className="mt-1 font-mono text-xs font-medium" style={{ color: r.color + 'BB' }}>{r.range}</p>
-                <p className="mt-2 text-sm leading-relaxed text-text-secondary">{r.desc}</p>
+                <p className="mt-2 text-sm sm:text-[15px] leading-relaxed text-text-secondary">{r.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -185,12 +185,12 @@ export default function HomePage() {
       </section>
 
       {/* ===== MÉTODO ===== */}
-      <section className="bg-bg-surface/50 px-4 py-20">
+      <section className="bg-bg-surface/30 backdrop-blur-sm px-4 py-16">
         <div className="mx-auto max-w-5xl">
           <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
             MÉTODO
           </p>
-          <h2 className="mb-12 text-center text-2xl font-bold sm:text-3xl">
+          <h2 className="mb-10 text-center text-xl font-bold sm:text-3xl">
             Tres pasos. Un diagnóstico.
           </h2>
 
@@ -214,12 +214,12 @@ export default function HomePage() {
       </section>
 
       {/* ===== INSTRUMENTO ===== */}
-      <section className="px-4 py-20">
+      <section className="px-4 py-16">
         <div className="mx-auto max-w-5xl">
           <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
             INSTRUMENTO
           </p>
-          <h2 className="mb-4 text-center text-2xl font-bold sm:text-3xl">
+          <h2 className="mb-4 text-center text-xl font-bold sm:text-3xl">
             Batería de evaluación
           </h2>
           <p className="mx-auto mb-12 max-w-xl text-center text-sm text-text-secondary">
@@ -258,7 +258,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== TRANSPARENCIA ===== */}
-      <section className="bg-bg-surface/50 px-4 py-20">
+      <section className="bg-bg-surface/30 backdrop-blur-sm px-4 py-16">
         <div className="mx-auto max-w-2xl">
           <div className="rounded-xl border border-border-subtle bg-bg-surface p-8">
             <p className="mb-3 font-mono text-xs tracking-[0.2em] text-text-muted uppercase">TRANSPARENCIA</p>
@@ -278,14 +278,14 @@ export default function HomePage() {
       </section>
 
       {/* ===== CTA FINAL ===== */}
-      <section className="px-4 py-20 text-center">
+      <section className="px-4 py-24 text-center">
         <p className="mb-3 font-mono text-xs tracking-[0.2em] text-text-muted uppercase">⌖ DIAGNÓSTICO</p>
-        <h2 className="mb-6 text-2xl font-bold sm:text-3xl">
+        <h2 className="mb-6 text-xl font-bold sm:text-3xl">
           ¿Listo para calcular tu Re<sub>org</sub>?
         </h2>
         <Link
           href="/consentimiento"
-          className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+          className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-base sm:text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
         >
           Iniciar diagnóstico →
         </Link>
@@ -293,6 +293,7 @@ export default function HomePage() {
           UNED · Grado en Psicología · 2025–2026
         </p>
       </section>
-    </main>
+      </main>
+    </div>
   );
 }
