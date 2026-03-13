@@ -3,27 +3,6 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-function FlowLines() {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute h-px w-full bg-gradient-to-r from-transparent via-accent-primary/30 to-transparent"
-          style={{ top: `${20 + i * 15}%` }}
-          animate={{ x: ['-100%', '100%'] }}
-          transition={{
-            duration: 8 + i * 2,
-            repeat: Infinity,
-            ease: 'linear',
-            delay: i * 0.5,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
@@ -70,7 +49,6 @@ export default function HomePage() {
             backgroundSize: '40px 40px',
           }}
         />
-        <FlowLines />
         {/* Radial glow */}
         <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-primary/8 blur-3xl" />
 
@@ -150,7 +128,7 @@ export default function HomePage() {
           <motion.div variants={fadeUp} custom={4} className="mt-10">
             <Link
               href="/consentimiento"
-              className="btn-fluid inline-flex min-h-12 items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+              className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
             >
               Iniciar diagnóstico →
             </Link>
@@ -186,7 +164,6 @@ export default function HomePage() {
                 key={r.name}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
                 className="rounded-xl border border-l-4 p-5 transition-all duration-200 hover:brightness-110"
@@ -246,7 +223,6 @@ export default function HomePage() {
                 key={s.n}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
                 className="rounded-xl border border-border-subtle bg-bg-surface p-6 transition-colors duration-150 hover:border-border-focus"
@@ -332,7 +308,7 @@ export default function HomePage() {
         </h2>
         <Link
           href="/consentimiento"
-          className="btn-fluid inline-flex min-h-12 items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+          className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
         >
           Iniciar diagnóstico →
         </Link>

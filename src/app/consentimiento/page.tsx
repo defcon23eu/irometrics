@@ -105,7 +105,7 @@ export default function ConsentPage() {
         <button
           onClick={handleStart}
           disabled={!accepted}
-          className="btn-fluid w-full min-h-12 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base sm:w-auto"
+          className="w-full min-h-12 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base sm:w-auto"
         >
           Iniciar diagnóstico →
         </button>
