@@ -20,9 +20,9 @@ const VALUE_LABELS: Record<number, string> = {
 
 export default function MBIScale({ value, onChange, disabled = false }: MBIScaleProps) {
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-3.5">
       {/* Labels above */}
-      <div className="flex justify-between px-0.5 text-[10px] leading-tight text-text-muted sm:text-xs">
+      <div className="flex justify-between px-0.5 text-[11px] leading-snug text-text-secondary sm:text-xs">
         <span>Nunca</span>
         <span>Siempre</span>
       </div>
@@ -31,7 +31,7 @@ export default function MBIScale({ value, onChange, disabled = false }: MBIScale
       <div
         role="radiogroup"
         aria-label="Escala de frecuencia de 0 a 6"
-        className="flex w-full items-center gap-1.5 sm:gap-2"
+        className="flex w-full items-center gap-1 sm:gap-2"
       >
         {Array.from({ length: 7 }, (_, i) => i).map((n) => {
           const isSelected = value === n;
@@ -49,8 +49,8 @@ export default function MBIScale({ value, onChange, disabled = false }: MBIScale
               className={`
                 flex-1 aspect-square rounded-full border-2
                 flex items-center justify-center
-                text-sm font-mono font-semibold
-                min-h-[44px]
+                text-base font-mono font-semibold
+                min-h-[46px]
                 transition-colors duration-150
                 ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                 ${isSelected
@@ -73,7 +73,7 @@ export default function MBIScale({ value, onChange, disabled = false }: MBIScale
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="min-h-[1.75rem] px-1 text-center text-[11px] leading-snug text-accent-primary font-medium [overflow-wrap:anywhere]"
+            className="min-h-[1.75rem] px-1 text-center text-xs leading-snug text-accent-primary font-medium [overflow-wrap:anywhere]"
           >
             {VALUE_LABELS[value]}
           </motion.p>

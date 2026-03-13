@@ -19,18 +19,18 @@ const VALUE_LABELS: Record<number, string> = {
 
 export default function OregScale({ value, onChange, disabled = false }: OregScaleProps) {
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-3.5">
       {/* Labels above */}
-      <div className="grid grid-cols-2 gap-2 px-0.5 text-[10px] leading-snug text-text-muted sm:text-xs">
-        <span className="max-w-[12ch] text-left [overflow-wrap:anywhere] sm:max-w-none">Totalmente en desacuerdo</span>
-        <span className="justify-self-end max-w-[12ch] text-right [overflow-wrap:anywhere] sm:max-w-none">Totalmente de acuerdo</span>
+      <div className="grid grid-cols-2 gap-2 px-0.5 text-[11px] leading-snug text-text-secondary sm:text-xs">
+        <span className="max-w-[13ch] text-left [overflow-wrap:anywhere] sm:max-w-none">Totalmente en desacuerdo</span>
+        <span className="justify-self-end max-w-[13ch] text-right [overflow-wrap:anywhere] sm:max-w-none">Totalmente de acuerdo</span>
       </div>
 
       {/* Buttons row — full width, 6 buttons = more space per button */}
       <div
         role="radiogroup"
         aria-label="Escala de 1 a 6"
-        className="flex w-full items-center gap-2 sm:gap-3"
+        className="flex w-full items-center gap-1.5 sm:gap-3"
       >
         {Array.from({ length: 6 }, (_, i) => i + 1).map((n) => {
           const isSelected = value === n;
@@ -48,8 +48,8 @@ export default function OregScale({ value, onChange, disabled = false }: OregSca
               className={`
                 flex-1 aspect-square rounded-full border-2
                 flex items-center justify-center
-                text-sm font-mono font-semibold
-                min-h-[44px]
+                text-base font-mono font-semibold
+                min-h-[46px]
                 transition-colors duration-150
                 ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                 ${isSelected
@@ -72,7 +72,7 @@ export default function OregScale({ value, onChange, disabled = false }: OregSca
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="min-h-[1.75rem] px-1 text-center text-[11px] leading-snug text-accent-primary font-medium [overflow-wrap:anywhere]"
+            className="min-h-[1.75rem] px-1 text-center text-xs leading-snug text-accent-primary font-medium [overflow-wrap:anywhere]"
           >
             {VALUE_LABELS[value]}
           </motion.p>

@@ -396,7 +396,7 @@ export default function DiagnosticoPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col px-4 py-6 sm:py-8">
+    <main className="flex min-h-screen flex-col px-3 py-5 sm:px-4 sm:py-8">
       {/* 4-block phase progress — shows % per phase, not "X of 50" */}
       <div className="mx-auto mb-4 w-full max-w-xl sm:mb-6">
         <div className="flex w-full gap-3">
@@ -440,7 +440,7 @@ export default function DiagnosticoPage() {
       </div>
 
       {/* Question area */}
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex flex-1 items-start justify-center pt-2 sm:items-center sm:pt-0">
         <div className="w-full max-w-xl">
           <AnimatePresence mode="wait">
             <motion.div
@@ -450,9 +450,9 @@ export default function DiagnosticoPage() {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="rounded-2xl border border-border-subtle bg-bg-elevated/60 p-4 sm:p-8"
+              className="rounded-2xl border border-border-subtle bg-bg-elevated/65 p-3.5 sm:p-8"
             >
-              <h2 className="mb-6 px-1 text-center text-[15px] font-semibold leading-relaxed [overflow-wrap:anywhere] sm:mb-8 sm:px-0 sm:text-xl">
+              <h2 className="mb-5 px-1 text-center text-[17px] font-semibold leading-relaxed [overflow-wrap:anywhere] sm:mb-8 sm:px-0 sm:text-xl">
                 {question.text}
               </h2>
               {renderInput()}
@@ -462,11 +462,11 @@ export default function DiagnosticoPage() {
       </div>
 
       {/* Navigation */}
-      <div className="mx-auto w-full max-w-xl pb-4">
+      <div className="mx-auto w-full max-w-xl pb-[max(12px,env(safe-area-inset-bottom))] pt-3">
         {state.currentItem > 0 && (
           <button
             onClick={handlePrev}
-            className="rounded-lg px-4 py-2 text-sm text-text-muted transition-colors hover:text-text-primary"
+            className="rounded-xl border border-border-subtle bg-bg-surface/60 px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:border-border-focus hover:text-text-primary"
           >
             ← Anterior
           </button>

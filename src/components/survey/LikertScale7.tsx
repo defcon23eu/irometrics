@@ -41,18 +41,18 @@ export default function LikertScale7({
   disabled = false,
 }: LikertScale7Props) {
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-3.5">
       {/* Labels above */}
-      <div className="grid grid-cols-2 gap-2 px-0.5 text-[10px] leading-snug text-text-muted sm:text-xs">
-        <span className="max-w-[12ch] text-left [overflow-wrap:anywhere] sm:max-w-none">{leftLabel}</span>
-        <span className="justify-self-end max-w-[12ch] text-right [overflow-wrap:anywhere] sm:max-w-none">{rightLabel}</span>
+      <div className="grid grid-cols-2 gap-2 px-0.5 text-[11px] leading-snug text-text-secondary sm:text-xs">
+        <span className="max-w-[13ch] text-left [overflow-wrap:anywhere] sm:max-w-none">{leftLabel}</span>
+        <span className="justify-self-end max-w-[13ch] text-right [overflow-wrap:anywhere] sm:max-w-none">{rightLabel}</span>
       </div>
 
       {/* Buttons row — full width, no lateral labels compressing */}
       <div
         role="radiogroup"
         aria-label="Escala de 1 a 7"
-        className="flex w-full items-center gap-1.5 sm:gap-2"
+        className="flex w-full items-center gap-1 sm:gap-2"
       >
         {Array.from({ length: 7 }, (_, i) => i + 1).map((n) => {
           const isSelected = value === n;
@@ -71,8 +71,8 @@ export default function LikertScale7({
               className={`
                 flex-1 aspect-square rounded-full border-2
                 flex items-center justify-center
-                text-sm font-mono font-semibold
-                min-h-[44px]
+                text-base font-mono font-semibold
+                min-h-[46px]
                 transition-colors duration-150
                 ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                 ${isSelected
@@ -98,7 +98,7 @@ export default function LikertScale7({
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="min-h-[1.75rem] px-1 text-center text-[11px] leading-snug text-accent-primary font-medium [overflow-wrap:anywhere]"
+            className="min-h-[1.75rem] px-1 text-center text-xs leading-snug text-accent-primary font-medium [overflow-wrap:anywhere]"
           >
             {VALUE_LABELS[value]}
           </motion.p>
