@@ -167,23 +167,42 @@ La UI está inspirada en dinámica de fluidos y el número de Reynolds:
 }
 ```
 
+### Arquitectura de Animaciones
+
+#### Archivo central: `src/lib/motion-presets.ts`
+Todas las variantes y configuraciones compartidas se importan desde este archivo:
+
+```tsx
+import { 
+  fadeIn, 
+  fadeInUp,
+  scaleIn, 
+  staggerContainer, 
+  staggerFast,
+  cardHover,
+  slideUp,
+  SPRING_BUTTON,
+  SPRING_GAUGE,
+  FLUID_EASE,
+  REGIME_COLORS,
+  ACCENT_COLOR,
+  getRegimeColor,
+  getFlowIntensity,
+  prefersReducedMotion,
+} from '@/lib/motion-presets';
+```
+
+#### Componentes de efectos: `src/components/effects/`
+```tsx
+import { FlowLines, Particles, FlowParticles, AnimatedCounter } from '@/components/effects';
+```
+
 ### Variantes de Animación Framer Motion
 
 #### 1. Fade In con Stagger
 ```tsx
-const fadeIn = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay, duration: 0.6, ease: [0.25, 0.4, 0.25, 1] },
-  }),
-};
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } },
-};
+// Importar desde motion-presets.ts
+import { fadeIn, staggerContainer } from '@/lib/motion-presets';
 
 // Uso
 <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
@@ -194,20 +213,21 @@ const staggerContainer = {
 
 #### 2. Scale In
 ```tsx
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: (delay: number = 0) => ({
-    opacity: 1,
-    scale: 1,
-    transition: { delay, duration: 0.5, ease: [0.25, 0.4, 0.25, 1] },
-  }),
-};
+import { scaleIn } from '@/lib/motion-presets';
+
+<motion.div variants={scaleIn} custom={0.2}>
+  {/* Contenido */}
+</motion.div>
 ```
 
 #### 3. Hover en Cards
 ```tsx
+import { cardHover } from '@/lib/motion-presets';
+
 <motion.div
-  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+  variants={cardHover}
+  initial="rest"
+  whileHover="hover"
   className="rounded-2xl border border-border-subtle bg-bg-card"
 >
   {/* Contenido */}
@@ -216,17 +236,110 @@ const scaleIn = {
 
 #### 4. Botón con Spring
 ```tsx
+import { SPRING_BUTTON } from '@/lib/motion-presets';
+
 <motion.button
   whileTap={{ scale: 0.9 }}
-  animate={isSelected ? { scale: 1.1 } : { scale: 1 }}
-  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+  transition={SPRING_BUTTON}
 >
   {children}
 </motion.button>
 ```
 
-### Componente: Líneas de Flujo
+#### 5. Transiciones de Preguntas
 ```tsx
+import { slideUp } from '@/lib/motion-presets';
+
+<AnimatePresence mode="wait">
+  <motion.div
+    key={questionId}
+    variants={slideUp}
+    initial="enter"
+    animate="center"
+    exit="exit"
+  >
+    {/* Pregunta */}
+  </motion.div>
+</AnimatePresence>
+```
+
+### Componentes de Efectos
+
+#### FlowLines - Líneas de flujo horizontales
+```tsx
+import { FlowLines } from '@/components/effects';
+
+// En el hero
+<FlowLines 
+  color="#6366F1"  // Opcional, default: ACCENT_COLOR
+  opacity={0.15}   // Opcional
+  count={5}        // Opcional, se reduce en móvil automáticamente
+/>
+```
+
+#### Particles - Partículas flotantes ambientales
+```tsx
+import { Particles } from '@/components/effects';
+
+<Particles 
+  color="#6366F1"  // Opcional
+  count={20}       // Opcional, se reduce en móvil
+/>
+```
+
+#### FlowParticles - Partículas dinámicas por intensidad
+```tsx
+import { FlowParticles } from '@/components/effects';
+import { getFlowIntensity } from '@/lib/motion-presets';
+
+const intensity = getFlowIntensity(reOrg); // 0-1
+
+<FlowParticles 
+  color={regimeColor}
+  intensity={intensity}
+/>
+```
+
+#### AnimatedCounter - Contador con física spring
+```tsx
+import { AnimatedCounter } from '@/components/effects';
+
+<AnimatedCounter 
+  value={reOrg}
+  decimals={1}   // Opcional, default: 1
+  duration={2}   // Opcional, default: 2
+/>
+```
+
+### Utilidades
+
+```tsx
+import { 
+  getRegimeColor,      // (reOrg: number) => string
+  getFlowIntensity,    // (reOrg: number) => number (0-1)
+  prefersReducedMotion, // () => boolean
+  isSmallDevice,       // () => boolean (<=375px)
+} from '@/lib/motion-presets';
+
+// Ejemplo
+const color = getRegimeColor(850); // '#EAB308' (transición)
+const intensity = getFlowIntensity(2500); // 0.5
+```
+
+### LEGACY - Definiciones inline (NO USAR)
+Las siguientes definiciones están obsoletas. Usar imports desde motion-presets.ts:
+
+```tsx
+// LEGACY - NO USAR
+const fadeIn = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (delay: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay, duration: 0.6, ease: [0.25, 0.4, 0.25, 1] },
+  }),
+};
+```
 function FlowLines() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">

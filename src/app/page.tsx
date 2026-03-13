@@ -3,30 +3,8 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
-
-// Animation variants
-const fadeIn = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay, duration: 0.6, ease: [0.25, 0.4, 0.25, 1] },
-  }),
-};
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } },
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: (delay: number = 0) => ({
-    opacity: 1,
-    scale: 1,
-    transition: { delay, duration: 0.5, ease: [0.25, 0.4, 0.25, 1] },
-  }),
-};
+import { FlowLines, Particles } from '@/components/effects';
+import { fadeIn, staggerContainer, scaleIn } from '@/lib/motion-presets';
 
 // Data
 const REGIMES = [

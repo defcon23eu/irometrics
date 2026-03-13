@@ -1,8 +1,10 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
-import { motion, useSpring, useTransform, AnimatePresence } from "framer-motion"
+import { useRef } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import type { IRORegime } from "@/types"
+import { FlowParticles, AnimatedCounter } from "@/components/effects"
+import { getFlowIntensity, SPRING_GAUGE } from "@/lib/motion-presets"
 
 interface IROGaugeProps {
   reOrg: number
@@ -23,79 +25,14 @@ const ZONES = [
   { start: 4000, end: 5000, color: "var(--color-regime-severo)",     label: "Severo" },
 ]
 
-// Animated counter with spring physics
-function AnimatedCounter({ value }: { value: number }) {
-  const spring = useSpring(0, { stiffness: 40, damping: 20 })
-  const display = useTransform(spring, (v) => v.toFixed(1))
-  const [displayValue, setDisplayValue] = useState("0.0")
-
-  useEffect(() => {
-    spring.set(value)
-  }, [spring, value])
-
-  useEffect(() => {
-    return display.on("change", (v) => setDisplayValue(v))
-  }, [display])
-
-  return <>{displayValue}</>
-}
-
-// Particle system for flow visualization
-function FlowParticles({ color, intensity }: { color: string; intensity: number }) {
-  const particleCount = Math.floor(intensity * 8) + 4
-  
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {Array.from({ length: particleCount }).map((_, i) => {
-        const delay = i * 0.3
-        const duration = 2 + Math.random() * 2
-        const startX = Math.random() * 100
-        const size = 2 + Math.random() * 3
-        
-        return (
-          <motion.div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: size,
-              height: size,
-              backgroundColor: color,
-              left: `${startX}%`,
-              opacity: 0.4 + intensity * 0.3,
-            }}
-            initial={{ top: "100%", opacity: 0 }}
-            animate={{ 
-              top: "-10%", 
-              opacity: [0, 0.6, 0],
-              x: intensity > 0.5 ? [0, (Math.random() - 0.5) * 40, 0] : 0
-            }}
-            transition={{
-              duration,
-              delay,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        )
-      })}
-    </div>
-  )
-}
-
 export default function IROGauge({ reOrg, regime }: IROGaugeProps) {
   const config = REGIME_CONFIG[regime]
   const svgRef = useRef<SVGSVGElement>(null)
-  const [isVisible, setIsVisible] = useState(false)
 
   // Clamp value and calculate angle (0-180 degrees for semicircle)
   const clampedValue = Math.min(Math.max(reOrg, 0), 5000)
   const angle = (clampedValue / 5000) * 180
-  const intensity = clampedValue / 5000
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setIsVisible(true), 100)
-    return () => clearTimeout(timeout)
-  }, [])
+  const intensity = getFlowIntensity(reOrg)
 
   return (
     <motion.div
