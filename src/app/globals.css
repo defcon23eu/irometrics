@@ -5,50 +5,50 @@
    ============================ */
 @theme inline {
   /* --- Backgrounds --- */
-  --color-bg-base:      #0A0A0B;
-  --color-bg-surface:   #0F0F11;
-  --color-bg-elevated:  #161618;
-  --color-bg-overlay:   #1C1C1F;
+  --color-bg-base:      #09090B;
+  --color-bg-surface:   #111113;
+  --color-bg-elevated:  #18181B;
+  --color-bg-overlay:   #1F1F23;
   --color-bg-card:      #121214;
 
   /* --- Text --- */
-  --color-text-primary:   #F8F8F8;
-  --color-text-secondary: #9CA3AF;
-  --color-text-muted:     #6B7280;
-  --color-text-accent:    #10B981;
+  --color-text-primary:   #FAFAFA;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted:     #52525B;
+  --color-text-accent:    #818CF8;
 
-  /* --- Accent / Brand (Emerald/Teal for scientific precision) --- */
-  --color-accent-primary: #10B981;
-  --color-accent-hover:   #34D399;
-  --color-accent-subtle:  #10B98112;
-  --color-accent-glow:    #10B98125;
-  --color-accent-border:  #10B98140;
+  /* --- Accent / Brand (Indigo) --- */
+  --color-accent-primary: #6366F1;
+  --color-accent-hover:   #818CF8;
+  --color-accent-subtle:  #6366F114;
+  --color-accent-glow:    #6366F130;
+  --color-accent-border:  #6366F14D;
 
-  /* --- Regime colors (refined palette) --- */
-  --color-regime-laminar:    #10B981;
-  --color-regime-transicion: #FBBF24;
+  /* --- Regime colors --- */
+  --color-regime-laminar:    #22C55E;
+  --color-regime-transicion: #EAB308;
   --color-regime-incipiente: #F97316;
   --color-regime-severo:     #EF4444;
-  --color-regime-laminar-bg:    #10B98110;
-  --color-regime-transicion-bg: #FBBF2410;
-  --color-regime-incipiente-bg: #F9731610;
-  --color-regime-severo-bg:     #EF444410;
+  --color-regime-laminar-bg:    #22C55E1F;
+  --color-regime-transicion-bg: #EAB3081F;
+  --color-regime-incipiente-bg: #F973161F;
+  --color-regime-severo-bg:     #EF44441F;
 
   /* --- Borders --- */
-  --color-border-subtle:  #1F1F23;
-  --color-border-default: #2D2D33;
-  --color-border-focus:   #10B981;
-  --color-border-success: #10B98180;
+  --color-border-subtle:  #27272A;
+  --color-border-default: #3F3F46;
+  --color-border-focus:   #6366F1;
+  --color-border-success: #22C55E80;
 
   /* --- Misc --- */
-  --color-grid-line: #F8F8F808;
+  --color-grid-line: #FAFAFA0A;
 
   /* --- Fonts --- */
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 
   /* --- Shadows --- */
-  --shadow-glow: 0 0 40px #10B98120;
+  --shadow-glow: 0 0 24px #6366F133;
   --shadow-card: 0 4px 24px #00000040;
 
   /* --- Animations --- */

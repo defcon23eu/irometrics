@@ -142,26 +142,26 @@ La UI está inspirada en dinámica de fluidos y el número de Reynolds:
 ```css
 @theme inline {
   /* Fondos */
-  --color-bg-base:      #0A0A0B;
-  --color-bg-surface:   #0F0F11;
-  --color-bg-elevated:  #161618;
+  --color-bg-base:      #09090B;
+  --color-bg-surface:   #111113;
+  --color-bg-elevated:  #18181B;
   --color-bg-card:      #121214;
 
   /* Texto */
-  --color-text-primary:   #F8F8F8;
-  --color-text-secondary: #9CA3AF;
-  --color-text-muted:     #6B7280;
-  --color-text-accent:    #10B981;
+  --color-text-primary:   #FAFAFA;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted:     #52525B;
+  --color-text-accent:    #818CF8;
 
-  /* Acento (Esmeralda) */
-  --color-accent-primary: #10B981;
-  --color-accent-hover:   #34D399;
-  --color-accent-subtle:  #10B98112;
-  --color-accent-glow:    #10B98125;
+  /* Acento (Indigo) */
+  --color-accent-primary: #6366F1;
+  --color-accent-hover:   #818CF8;
+  --color-accent-subtle:  #6366F114;
+  --color-accent-glow:    #6366F130;
 
   /* Colores de Régimen (Estados de Flujo) */
-  --color-regime-laminar:    #10B981;  /* Verde - estable */
-  --color-regime-transicion: #FBBF24;  /* Ámbar - advertencia */
+  --color-regime-laminar:    #22C55E;  /* Verde - estable */
+  --color-regime-transicion: #EAB308;  /* Ámbar - advertencia */
   --color-regime-incipiente: #F97316;  /* Naranja - precaución */
   --color-regime-severo:     #EF4444;  /* Rojo - crítico */
 }

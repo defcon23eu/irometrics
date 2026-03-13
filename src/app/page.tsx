@@ -41,7 +41,7 @@ const REGIMES = [
     name: 'Flujo Laminar',
     shortName: 'Laminar',
     range: 'Re < 100',
-    color: '#10B981',
+    color: '#22C55E',
     desc: 'Operaciones estables y predecibles. Equipos sincronizados con baja friccion.',
   },
   {
@@ -55,7 +55,7 @@ const REGIMES = [
     name: 'Zona de Transicion',
     shortName: 'Transicion',
     range: '100 - 800',
-    color: '#FBBF24',
+    color: '#EAB308',
     desc: 'Primeras tensiones detectables. Momento optimo para intervenir y prevenir.',
   },
   {
@@ -173,7 +173,7 @@ export default function HomePage() {
         className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden"
       >
         {/* Background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,#10B98115,transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,#6366F115,transparent)]" />
         <FlowLines />
         <Particles />
         
@@ -271,7 +271,7 @@ export default function HomePage() {
             <motion.div variants={fadeIn} custom={0.4} className="pt-4">
               <Link
                 href="/consentimiento"
-                className="group inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-accent-primary text-bg-base font-semibold text-lg transition-all duration-300 hover:bg-accent-hover hover:shadow-[0_0_40px_#10B98140] focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+                className="group inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-accent-primary text-white font-semibold text-lg transition-all duration-300 hover:bg-accent-hover hover:shadow-[0_0_40px_#6366F140] focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
               >
                 Iniciar diagnostico
                 <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
