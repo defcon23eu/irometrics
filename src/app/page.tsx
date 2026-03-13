@@ -158,7 +158,7 @@ export default function HomePage() {
             El Índice de Reynolds Organizacional clasifica la dinámica de tu equipo en un espectro continuo — del orden al caos.
           </p>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto grid max-w-3xl gap-4 grid-cols-1 sm:grid-cols-2">
             {REGIMES.map((r, i) => (
               <motion.div
                 key={r.name}
@@ -179,30 +179,6 @@ export default function HomePage() {
                 <p className="mt-2 text-sm text-text-secondary">{r.desc}</p>
               </motion.div>
             ))}
-          </div>
-
-          {/* Regime table */}
-          <div className="mt-8 overflow-x-auto rounded-xl border border-border-subtle bg-bg-surface">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-border-subtle text-xs uppercase tracking-wider text-text-muted">
-                  <th className="px-5 py-3 font-mono font-medium">Re<sub>org</sub></th>
-                  <th className="px-5 py-3 font-medium">Régimen</th>
-                  <th className="hidden px-5 py-3 font-medium sm:table-cell">Descripción</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {REGIMES.map((r) => (
-                  <tr key={r.name}>
-                    <td className="whitespace-nowrap px-5 py-3 font-mono text-text-secondary">{r.range}</td>
-                    <td className="px-5 py-3 font-semibold" style={{ color: r.color }}>
-                      <span className="mr-1.5">{r.icon}</span>{r.name}
-                    </td>
-                    <td className="hidden px-5 py-3 text-text-secondary sm:table-cell">{r.desc}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </div>
       </section>
