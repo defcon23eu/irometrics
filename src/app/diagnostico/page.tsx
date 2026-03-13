@@ -396,6 +396,8 @@ export default function DiagnosticoPage() {
     exit: { x: slideDirection * -300, opacity: 0 },
   };
 
+  const globalPct = Math.round(((state.currentItem + 1) / TOTAL_ITEMS) * 100);
+
   return (
     <main className="flex min-h-screen flex-col px-4 py-4 sm:py-6">
       {/* Global IRO progress spectrum */}
@@ -425,12 +427,25 @@ export default function DiagnosticoPage() {
           {blockMeta.label}
         </p>
 
+        <p className="mb-2 font-mono text-xs tracking-[0.12em] text-text-muted uppercase">
+          Pregunta {state.currentItem + 1} de {TOTAL_ITEMS}
+        </p>
+
         {/* Block progress bar */}
-        <div className="h-1 w-full overflow-hidden rounded-full bg-bg-elevated">
+        <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-bg-elevated/60">
           <motion.div
-            className="h-full rounded-full bg-accent-primary"
-            animate={{ width: `${blockProgress.pct}%` }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="absolute inset-y-0 left-0 rounded-full"
+            animate={{ width: `${globalPct}%` }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+            style={{
+              background: 'linear-gradient(90deg, var(--color-regime-laminar) 0%, var(--color-regime-transicion) 50%, var(--color-accent-primary) 100%)',
+            }}
+          />
+          <motion.div
+            className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border-2 border-bg-base"
+            animate={{ left: `calc(${globalPct}% - 6px)` }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+            style={{ backgroundColor: 'var(--color-accent-primary)' }}
           />
         </div>
       </div>
@@ -445,7 +460,7 @@ export default function DiagnosticoPage() {
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.42, ease: [0.25, 0.4, 0.25, 1] }}
               className="rounded-2xl border border-border-subtle bg-bg-elevated/60 p-6 shadow-[0_12px_32px_rgba(0,0,0,0.24)] sm:p-8"
             >
               <h2 className="mb-8 text-center text-lg font-semibold leading-relaxed sm:text-[1.35rem]">

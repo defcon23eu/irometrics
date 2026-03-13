@@ -17,6 +17,18 @@ const VALUE_LABELS: Record<number, string> = {
   6: 'Totalmente de acuerdo',
 };
 
+function getButtonColor(n: number): string {
+  const colors = [
+    'var(--color-regime-laminar)',
+    '#6EE7B7',
+    'var(--color-regime-transicion)',
+    'var(--color-regime-incipiente)',
+    '#FB7185',
+    'var(--color-regime-severo)',
+  ];
+  return colors[n - 1];
+}
+
 export default function OregScale({ value, onChange, disabled = false }: OregScaleProps) {
   return (
     <div className="w-full space-y-4">
@@ -36,6 +48,7 @@ export default function OregScale({ value, onChange, disabled = false }: OregSca
       >
           {Array.from({ length: 6 }, (_, i) => i + 1).map((n) => {
             const isSelected = value === n;
+            const buttonColor = getButtonColor(n);
             return (
               <motion.button
                 key={n}
@@ -52,10 +65,17 @@ export default function OregScale({ value, onChange, disabled = false }: OregSca
                   transition-all duration-150
                   ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                   ${isSelected
-                    ? 'bg-accent-primary border-accent-primary text-white scale-105 shadow-[0_0_16px_#6366F125]'
+                    ? 'text-white scale-105'
                     : 'bg-bg-elevated border-border-subtle text-text-muted hover:border-border-focus hover:text-text-primary hover:bg-bg-elevated/80'
                   }
                 `}
+                style={isSelected
+                  ? {
+                      backgroundColor: buttonColor,
+                      borderColor: buttonColor,
+                      boxShadow: `0 0 20px ${buttonColor}60`,
+                    }
+                  : undefined}
               >
                 {n}
               </motion.button>
