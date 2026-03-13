@@ -1,8 +1,8 @@
 'use client';
 
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
 
 // Animation variants
 const fadeIn = {
@@ -457,20 +457,20 @@ export default function HomePage() {
                 </div>
               ))}
               {INSTRUMENTS.map((inst) => (
-                <>
-                  <div key={`${inst.block}-block`} className="px-4 py-4 bg-bg-card font-mono font-bold text-accent-primary">
+                <React.Fragment key={`instrument-${inst.block}`}>
+                  <div className="px-4 py-4 bg-bg-card font-mono font-bold text-accent-primary">
                     {inst.block}
                   </div>
-                  <div key={`${inst.block}-name`} className="px-4 py-4 bg-bg-card text-text-primary font-medium">
+                  <div className="px-4 py-4 bg-bg-card text-text-primary font-medium">
                     {inst.name}
                   </div>
-                  <div key={`${inst.block}-items`} className="px-4 py-4 bg-bg-card font-mono text-text-secondary">
+                  <div className="px-4 py-4 bg-bg-card font-mono text-text-secondary">
                     {inst.items}
                   </div>
-                  <div key={`${inst.block}-scale`} className="px-4 py-4 bg-bg-card font-mono text-text-secondary">
+                  <div className="px-4 py-4 bg-bg-card font-mono text-text-secondary">
                     {inst.scale}
                   </div>
-                </>
+                </React.Fragment>
               ))}
               <div className="px-4 py-4 bg-bg-elevated font-mono font-bold text-text-primary">S</div>
               <div className="px-4 py-4 bg-bg-elevated text-text-primary font-semibold">Total</div>
