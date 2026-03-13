@@ -15,11 +15,8 @@ export default function ConsentPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16">
+    <main className="min-h-screen flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-2xl">
-        <p className="mb-2 font-mono text-xs tracking-[0.18em] uppercase text-text-muted">
-          CONSENTIMIENTO INFORMADO
-        </p>
         <h1 className="mb-10 text-3xl font-bold sm:text-4xl">
           Antes de comenzar
         </h1>
@@ -105,7 +102,7 @@ export default function ConsentPage() {
         <button
           onClick={handleStart}
           disabled={!accepted}
-          className="w-full min-h-12 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base sm:w-auto"
+          className="w-full rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base sm:w-auto"
         >
           Iniciar diagnóstico →
         </button>
