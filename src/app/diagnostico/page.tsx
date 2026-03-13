@@ -4,7 +4,7 @@ import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { SurveyState, SurveyAction, BlockB } from '@/types';
-import { ALL_QUESTIONS, TOTAL_ITEMS, BLOCK_TRANSITIONS, BLOCK_RANGES } from '@/lib/questions';
+import { ALL_QUESTIONS, TOTAL_ITEMS, BLOCK_RANGES } from '@/lib/questions';
 import { calculateIRO } from '@/lib/iro-calculator';
 import LikertScale7 from '@/components/survey/LikertScale7';
 import MBIScale from '@/components/survey/MBIScale';
@@ -127,20 +127,6 @@ export default function DiagnosticoPage() {
 
   // Cleanup on unmount
   useEffect(() => () => clearAutoAdvance(), []);
-
-  const getBlockTransitionMessage = useCallback(
-    (fromIdx: number): string | null => {
-      if (fromIdx >= TOTAL_ITEMS - 1) return null;
-      const currentBlock = ALL_QUESTIONS[fromIdx].block;
-      const nextBlock = ALL_QUESTIONS[fromIdx + 1].block;
-      if (currentBlock !== nextBlock) {
-        const key = `${currentBlock}_${nextBlock}`;
-        return BLOCK_TRANSITIONS[key] ?? null;
-      }
-      return null;
-    },
-    [],
-  );
 
   const getBlockTransitionKey = useCallback(
     (fromIdx: number): string | null => {
@@ -411,9 +397,9 @@ export default function DiagnosticoPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col px-4 py-8">
+    <main className="flex min-h-screen flex-col px-4 py-4 sm:py-6">
       {/* Global IRO progress spectrum */}
-      <div className="mx-auto mb-6 w-full max-w-xl">
+      <div className="sticky top-0 z-20 mx-auto mb-4 w-full max-w-xl rounded-xl border border-border-subtle bg-bg-base/85 px-3 py-3 backdrop-blur-sm sm:mb-6">
         <ProgressSpectrum
           currentStep={state.currentItem + 1}
           totalSteps={TOTAL_ITEMS}
@@ -435,7 +421,7 @@ export default function DiagnosticoPage() {
           </span>
         </div>
 
-        <p className="mb-3 text-sm font-medium text-text-secondary">
+        <p className="mb-4 text-sm font-medium text-text-secondary sm:text-[15px]">
           {blockMeta.label}
         </p>
 
@@ -459,10 +445,10 @@ export default function DiagnosticoPage() {
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="rounded-2xl border border-border-subtle bg-bg-elevated/50 p-6 sm:p-8"
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              className="rounded-2xl border border-border-subtle bg-bg-elevated/60 p-6 shadow-[0_12px_32px_rgba(0,0,0,0.24)] sm:p-8"
             >
-              <h2 className="mb-8 text-center text-lg font-semibold leading-relaxed sm:text-xl">
+              <h2 className="mb-8 text-center text-lg font-semibold leading-relaxed sm:text-[1.35rem]">
                 {question.text}
               </h2>
               {renderInput()}
@@ -476,7 +462,7 @@ export default function DiagnosticoPage() {
         {state.currentItem > 0 && (
           <button
             onClick={handlePrev}
-            className="rounded-lg px-4 py-2 text-sm text-text-muted transition-colors hover:text-text-primary"
+            className="min-h-12 rounded-xl border border-border-subtle px-5 py-3 text-sm font-medium text-text-secondary transition-colors hover:border-border-focus hover:text-text-primary"
           >
             ← Anterior
           </button>

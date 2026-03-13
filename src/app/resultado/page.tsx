@@ -19,7 +19,10 @@ function useCountUp(target: number, duration = 1800, delay = 200) {
 
   useEffect(() => {
     if (target <= 0) return;
-    if (prefersReduced.current) { setValue(target); return; }
+    if (prefersReduced.current) {
+      const rafImmediate = requestAnimationFrame(() => setValue(target));
+      return () => cancelAnimationFrame(rafImmediate);
+    }
 
     const startTime = performance.now() + delay;
     const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -68,10 +71,11 @@ export default function ResultadoPage() {
         return;
       }
       const parsed = JSON.parse(raw) as IROResult;
-      setResult(parsed);
+      const rafParsed = requestAnimationFrame(() => setResult(parsed));
       // CLEANUP: only remove survey-specific keys, keep consent_at for analytics
       sessionStorage.removeItem('survey_state');
       sessionStorage.removeItem('iro_result');
+      return () => cancelAnimationFrame(rafParsed);
     } catch {
       router.replace('/');
     }
