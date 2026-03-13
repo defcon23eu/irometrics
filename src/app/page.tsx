@@ -1,312 +1,546 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
+// Animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (delay: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: 'easeOut' as const },
+    transition: { delay, duration: 0.6, ease: [0.25, 0.4, 0.25, 1] },
   }),
 };
 
-const stagger = {
+const staggerContainer = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.12 } },
 };
 
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: (delay: number = 0) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { delay, duration: 0.5, ease: [0.25, 0.4, 0.25, 1] },
+  }),
+};
+
+// Data
 const REGIMES = [
-  { icon: '◈', name: 'Laminar', range: 'Re < 100', color: '#22C55E', bg: '#22C55E0D', border: '#22C55E26', desc: 'Flujo estable y predecible. Baja fricción interna.' },
-  { icon: '⧫', name: 'Transición', range: '100 ≤ Re < 800', color: '#EAB308', bg: '#EAB3080D', border: '#EAB30826', desc: 'Señales de tensión emergente. Momento de intervenir.' },
-  { icon: '■', name: 'Turbulencia incipiente', range: '800 ≤ Re < 1200', color: '#F97316', bg: '#F973160D', border: '#F9731626', desc: 'Inestabilidad visible. Riesgo de desgaste moderado-alto.' },
-  { icon: '▶', name: 'Turbulencia severa', range: 'Re ≥ 1200', color: '#EF4444', bg: '#EF44440D', border: '#EF444426', desc: 'Dinámica caótica. Intervención prioritaria.' },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+        <path d="M4 12h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M4 8h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+        <path d="M4 16h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+      </svg>
+    ),
+    name: 'Laminar',
+    range: 'Re < 100',
+    color: '#10B981',
+    desc: 'Flujo estable y predecible. Baja friccion interna. Equipos sincronizados.',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+        <path d="M4 12c4-2 8 2 12 0s4-2 4-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M4 8c4-1 8 1 12 0s4-1 4-1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+        <path d="M4 16c4-1 8 1 12 0s4-1 4-1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+      </svg>
+    ),
+    name: 'Transicion',
+    range: '100 - 800',
+    color: '#FBBF24',
+    desc: 'Senales de tension emergente. Fluctuaciones detectables. Momento de intervenir.',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+        <path d="M4 12c2-3 4 3 6-2s4 4 6-1 4 2 4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M4 7c2-2 4 2 6-1s4 3 6-1 4 1 4 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+        <path d="M4 17c2-2 4 2 6-1s4 3 6-1 4 1 4 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+      </svg>
+    ),
+    name: 'Turbulencia Incipiente',
+    range: '800 - 1200',
+    color: '#F97316',
+    desc: 'Inestabilidad visible. Riesgo de desgaste moderado-alto. Patrones caoticos.',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+        <path d="M4 12c1-4 2 4 4-3s3 5 4-2 3 4 4-2 3 3 4 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M4 6c1-3 2 3 4-2s3 4 4-2 3 3 4-1 3 2 4 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+        <path d="M4 18c1-3 2 3 4-2s3 4 4-2 3 3 4-1 3 2 4 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+      </svg>
+    ),
+    name: 'Turbulencia Severa',
+    range: 'Re > 1200',
+    color: '#EF4444',
+    desc: 'Dinamica caotica. Intervencion prioritaria. Alto riesgo de burnout.',
+  },
 ];
 
 const STEPS = [
-  { n: '01', title: 'Contexto', desc: '5 preguntas sobre tu empresa, rol y antigüedad. Sin datos identificativos.' },
-  { n: '02', title: 'Diagnóstico', desc: '45 ítems: dinámica organizacional (IRO), desgaste profesional (MBI-GS), resistencia al cambio (Oreg RTC).' },
-  { n: '03', title: 'Resultado', desc: 'Re_org inmediato. Clasificación visual de régimen con desglose por subescala.' },
+  { n: '01', title: 'Contexto', desc: '5 preguntas sobre sector, rol y antiguedad. Sin datos identificativos.', time: '~1 min' },
+  { n: '02', title: 'Diagnostico', desc: '45 items validados: dinamica organizacional, desgaste profesional, resistencia al cambio.', time: '~7 min' },
+  { n: '03', title: 'Resultado', desc: 'Indice Re_org inmediato con clasificacion visual y desglose por subescala.', time: 'Instantaneo' },
 ];
 
-const INSTRUMENT = [
-  { bloque: 'A', instrumento: 'Sociodemográfico', items: '5', escala: '—' },
-  { bloque: 'B', instrumento: 'Protocolo IRO', items: '12', escala: 'Likert 1–7' },
-  { bloque: 'C', instrumento: 'MBI-GS (Gil-Monte, 2002)', items: '16', escala: '0–6' },
-  { bloque: 'D', instrumento: 'Oreg RTC (Oreg, 2003)', items: '17', escala: 'Likert 1–6' },
+const INSTRUMENTS = [
+  { block: 'A', name: 'Sociodemografico', items: 5, scale: '-' },
+  { block: 'B', name: 'Protocolo IRO', items: 12, scale: '1-7' },
+  { block: 'C', name: 'MBI-GS', items: 16, scale: '0-6' },
+  { block: 'D', name: 'Oreg RTC', items: 17, scale: '1-6' },
 ];
 
-export default function HomePage() {
+// Flow lines background component
+function FlowLines() {
   return (
-    <main className="min-h-screen">
-      {/* ===== HERO ===== */}
-      <section
-        className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4"
-        style={{ background: 'linear-gradient(180deg, var(--color-bg-base) 0%, var(--color-bg-surface) 100%)' }}
-      >
-        {/* Grid background */}
-        <div
-          className="pointer-events-none absolute inset-0"
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(5)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute h-px bg-gradient-to-r from-transparent via-accent-primary/30 to-transparent"
           style={{
-            backgroundImage:
-              'linear-gradient(var(--color-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
+            top: `${20 + i * 15}%`,
+            width: '100%',
+          }}
+          animate={{
+            x: ['-100%', '100%'],
+          }}
+          transition={{
+            duration: 8 + i * 2,
+            repeat: Infinity,
+            ease: 'linear',
+            delay: i * 0.5,
           }}
         />
-        {/* Radial glow */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-primary/8 blur-3xl" />
+      ))}
+    </div>
+  );
+}
+
+// Floating particles
+function Particles() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(20)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full bg-accent-primary/40"
+          style={{
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+          }}
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0.2, 0.6, 0.2],
+          }}
+          transition={{
+            duration: 3 + Math.random() * 2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: Math.random() * 2,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function HomePage() {
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
+
+  return (
+    <main className="min-h-screen bg-bg-base">
+      {/* ===== HERO ===== */}
+      <section
+        ref={heroRef}
+        className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden"
+      >
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,#10B98115,transparent)]" />
+        <FlowLines />
+        <Particles />
+        
+        {/* Grid overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            backgroundImage: `
+              linear-gradient(var(--color-grid-line) 1px, transparent 1px),
+              linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        />
 
         <motion.div
-          className="relative z-10 max-w-3xl text-center"
-          initial="hidden"
-          animate="visible"
-          variants={stagger}
+          style={{ opacity: heroOpacity, y: heroY }}
+          className="relative z-10 max-w-4xl mx-auto text-center"
         >
-          {/* Badge */}
-          <motion.p
-            variants={fadeUp}
-            custom={0}
-            className="mb-6 inline-block rounded-full border border-border-subtle bg-bg-surface/60 px-4 py-1.5 font-mono text-xs tracking-widest text-text-secondary"
-          >
-            ✦ DIAGNÓSTICO · UNED PSICOLOGÍA · 2025–2026
-          </motion.p>
-
-          {/* Headline */}
-          <motion.h1
-            variants={fadeUp}
-            custom={1}
-            className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl"
-          >
-            ¿En qué régimen opera tu organización?
-          </motion.h1>
-
-          {/* Equation — styled formula container */}
           <motion.div
-            variants={fadeUp}
-            custom={2}
-            className="my-8 flex flex-col items-center gap-3"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+            className="space-y-8"
           >
-            <div className="w-40 h-px bg-gradient-to-r from-transparent via-border-default to-transparent" />
+            {/* Badge */}
+            <motion.div variants={fadeIn} custom={0}>
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border-subtle bg-bg-surface/80 backdrop-blur-sm text-xs font-mono tracking-wider text-text-muted">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse" />
+                INVESTIGACION UNED 2025-2026
+              </span>
+            </motion.div>
 
-            <div className="
-              relative group cursor-help
-              px-6 py-3 rounded-lg
-              bg-accent-subtle border border-border-focus/20
-              hover:border-border-focus/40 transition-all duration-300
-            ">
-              {/* Radial glow on hover */}
-              <div className="
-                absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100
-                transition-opacity duration-300 pointer-events-none
-                bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,#6366F112,transparent)]
-              " />
+            {/* Headline */}
+            <motion.h1
+              variants={fadeIn}
+              custom={0.1}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance leading-[1.1]"
+            >
+              <span className="text-text-primary">Mide la </span>
+              <span className="text-accent-primary">turbulencia</span>
+              <br />
+              <span className="text-text-primary">de tu organizacion</span>
+            </motion.h1>
 
-              {/* Formula */}
-              <p className="relative font-mono text-lg sm:text-xl font-medium
-                            text-accent-primary tracking-wide select-none">
-                Re<sub className="text-xs align-sub">org</sub>
-                <span className="text-text-secondary mx-2">=</span>
-                <span className="text-text-primary">(δ · v · D)</span>
-                <span className="text-text-secondary mx-2">/</span>
-                <span className="text-text-primary">μ</span>
+            {/* Formula card */}
+            <motion.div
+              variants={scaleIn}
+              custom={0.2}
+              className="inline-flex flex-col items-center"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-accent-primary/20 via-accent-primary/10 to-accent-primary/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative px-8 py-5 rounded-xl border border-border-subtle bg-bg-card/90 backdrop-blur-sm">
+                  <p className="font-mono text-xl sm:text-2xl md:text-3xl font-medium tracking-wide">
+                    <span className="text-accent-primary">Re</span>
+                    <sub className="text-sm text-text-muted">org</sub>
+                    <span className="text-text-muted mx-3">=</span>
+                    <span className="text-text-primary">(</span>
+                    <span className="text-accent-primary">d</span>
+                    <span className="text-text-muted mx-1">·</span>
+                    <span className="text-accent-primary">v</span>
+                    <span className="text-text-muted mx-1">·</span>
+                    <span className="text-accent-primary">D</span>
+                    <span className="text-text-primary">)</span>
+                    <span className="text-text-muted mx-2">/</span>
+                    <span className="text-accent-primary">m</span>
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm text-text-muted font-mono tracking-widest uppercase">
+                Indice de Reynolds Organizacional
               </p>
-            </div>
+            </motion.div>
 
-            <p className="text-[11px] text-text-muted font-sans tracking-wide uppercase">
-              Índice de Reynolds Organizacional
-            </p>
-
-            <div className="w-40 h-px bg-gradient-to-r from-transparent via-border-default to-transparent" />
-          </motion.div>
-
-          {/* Stats */}
-          <motion.p
-            variants={fadeUp}
-            custom={3}
-            className="mt-4 font-mono text-sm text-text-muted"
-          >
-            08 min · 50 ítems · Re<sub>org</sub> inmediato
-          </motion.p>
-
-          {/* CTA */}
-          <motion.div variants={fadeUp} custom={4} className="mt-10">
-            <Link
-              href="/consentimiento"
-              className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+            {/* Stats row */}
+            <motion.div
+              variants={fadeIn}
+              custom={0.3}
+              className="flex items-center justify-center gap-6 sm:gap-10 text-center"
             >
-              Iniciar diagnóstico →
-            </Link>
+              {[
+                { value: '8', label: 'minutos' },
+                { value: '50', label: 'items' },
+                { value: '4', label: 'instrumentos' },
+              ].map((stat) => (
+                <div key={stat.label} className="flex flex-col">
+                  <span className="text-2xl sm:text-3xl font-bold text-text-primary font-mono">{stat.value}</span>
+                  <span className="text-xs text-text-muted uppercase tracking-wider">{stat.label}</span>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div variants={fadeIn} custom={0.4} className="pt-4">
+              <Link
+                href="/consentimiento"
+                className="group inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-accent-primary text-bg-base font-semibold text-lg transition-all duration-300 hover:bg-accent-hover hover:shadow-[0_0_40px_#10B98140] focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+              >
+                Iniciar diagnostico
+                <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </motion.div>
+
+            {/* Trust indicators */}
+            <motion.p variants={fadeIn} custom={0.5} className="text-sm text-text-muted">
+              100% anonimo · Sin registro · Sin cookies
+            </motion.p>
+
+            {/* Demo link */}
+            <motion.div variants={fadeIn} custom={0.6}>
+              <Link
+                href="/demo"
+                className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-accent-primary transition-colors"
+              >
+                <span className="font-mono text-[10px] px-2 py-1 rounded border border-border-subtle bg-bg-surface">DEMO</span>
+                Ver simulacion interactiva
+              </Link>
+            </motion.div>
           </motion.div>
+        </motion.div>
 
-          {/* Trust */}
-          <motion.p
-            variants={fadeUp}
-            custom={5}
-            className="mt-4 text-xs text-text-muted"
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className="w-6 h-10 rounded-full border-2 border-border-subtle flex items-start justify-center p-2"
           >
-            100 % anónimo · Sin registro · Sin cookies
-          </motion.p>
-
-          {/* Demo link */}
-          <motion.div variants={fadeUp} custom={6} className="mt-6">
-            <Link
-              href="/demo"
-              className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-accent-primary transition-colors"
-            >
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-bg-surface border border-border-subtle">DEMO</span>
-              Ver simulación del flujo de preguntas
-            </Link>
+            <motion.div className="w-1 h-2 rounded-full bg-text-muted" />
           </motion.div>
         </motion.div>
       </section>
 
-      {/* ===== RÉGIMEN ===== */}
-      <section className="px-4 py-20">
-        <div className="mx-auto max-w-5xl">
-          <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
-            RÉGIMEN
-          </p>
-          <h2 className="mb-4 text-center text-2xl font-bold sm:text-3xl">
-            Cuatro estados de flujo organizacional
-          </h2>
-          <p className="mx-auto mb-12 max-w-xl text-center text-sm text-text-secondary">
-            El Índice de Reynolds Organizacional clasifica la dinámica de tu equipo en un espectro continuo — del orden al caos.
-          </p>
+      {/* ===== REGIMES ===== */}
+      <section className="relative py-24 sm:py-32 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={staggerContainer}
+            className="text-center mb-16"
+          >
+            <motion.p variants={fadeIn} className="text-sm font-mono tracking-[0.3em] text-accent-primary uppercase mb-4">
+              Regimenes
+            </motion.p>
+            <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary mb-6">
+              Cuatro estados de flujo
+            </motion.h2>
+            <motion.p variants={fadeIn} className="max-w-2xl mx-auto text-text-secondary text-lg">
+              El Indice de Reynolds Organizacional clasifica la dinamica de tu equipo en un espectro continuo, del orden al caos.
+            </motion.p>
+          </motion.div>
 
-          <div className="mx-auto grid max-w-3xl gap-4 grid-cols-1 sm:grid-cols-2">
-            {REGIMES.map((r, i) => (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {REGIMES.map((regime, i) => (
               <motion.div
-                key={r.name}
+                key={regime.name}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
-                transition={{ delay: i * 0.08, duration: 0.5 }}
-                className="rounded-xl border border-l-4 p-5 transition-all duration-200 hover:brightness-110"
-                style={{
-                  backgroundColor: r.bg,
-                  borderColor: r.border,
-                  borderLeftColor: r.color,
-                }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="group relative p-6 rounded-2xl border border-border-subtle bg-bg-card overflow-hidden"
               >
-                <span className="font-mono text-2xl" style={{ color: r.color }}>{r.icon}</span>
-                <h3 className="mt-2 text-base font-semibold text-text-primary">{r.name}</h3>
-                <p className="mt-1 font-mono text-xs text-text-muted">{r.range}</p>
-                <p className="mt-2 text-sm text-text-secondary">{r.desc}</p>
+                {/* Glow effect on hover */}
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: `radial-gradient(circle at 50% 0%, ${regime.color}15, transparent 70%)` }}
+                />
+                
+                {/* Top accent line */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
+                  style={{ background: `linear-gradient(90deg, transparent, ${regime.color}, transparent)` }}
+                />
+
+                <div className="relative">
+                  <div style={{ color: regime.color }}>{regime.icon}</div>
+                  <h3 className="mt-4 text-lg font-semibold text-text-primary">{regime.name}</h3>
+                  <p className="mt-1 font-mono text-sm" style={{ color: regime.color }}>
+                    {regime.range}
+                  </p>
+                  <p className="mt-3 text-sm text-text-secondary leading-relaxed">
+                    {regime.desc}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== MÉTODO ===== */}
-      <section className="bg-bg-surface/50 px-4 py-20">
-        <div className="mx-auto max-w-5xl">
-          <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
-            MÉTODO
-          </p>
-          <h2 className="mb-12 text-center text-2xl font-bold sm:text-3xl">
-            Tres pasos. Un diagnóstico.
-          </h2>
+      {/* ===== METHOD ===== */}
+      <section className="relative py-24 sm:py-32 px-4 bg-bg-surface/50">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={staggerContainer}
+            className="text-center mb-16"
+          >
+            <motion.p variants={fadeIn} className="text-sm font-mono tracking-[0.3em] text-accent-primary uppercase mb-4">
+              Metodo
+            </motion.p>
+            <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary mb-6">
+              Tres pasos, un diagnostico
+            </motion.h2>
+          </motion.div>
 
-          <div className="grid gap-8 sm:grid-cols-3">
-            {STEPS.map((s, i) => (
+          <div className="grid gap-6 md:grid-cols-3">
+            {STEPS.map((step, i) => (
               <motion.div
-                key={s.n}
-                initial={{ opacity: 0, y: 20 }}
+                key={step.n}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="rounded-xl border border-border-subtle bg-bg-surface p-6 transition-colors duration-150 hover:border-border-focus"
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                className="relative p-8 rounded-2xl border border-border-subtle bg-bg-card"
               >
-                <span className="font-mono text-3xl font-bold text-accent-primary">{s.n}</span>
-                <h3 className="mt-3 text-lg font-semibold">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-secondary">{s.desc}</p>
+                <div className="flex items-start justify-between mb-4">
+                  <span className="text-5xl font-bold font-mono text-accent-primary/20">{step.n}</span>
+                  <span className="px-3 py-1 rounded-full border border-border-subtle text-xs font-mono text-text-muted">
+                    {step.time}
+                  </span>
+                </div>
+                <h3 className="text-xl font-semibold text-text-primary mb-3">{step.title}</h3>
+                <p className="text-text-secondary leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== INSTRUMENTO ===== */}
-      <section className="px-4 py-20">
-        <div className="mx-auto max-w-5xl">
-          <p className="mb-3 text-center font-mono text-xs tracking-[0.2em] text-text-muted uppercase">
-            INSTRUMENTO
-          </p>
-          <h2 className="mb-4 text-center text-2xl font-bold sm:text-3xl">
-            Batería de evaluación
-          </h2>
-          <p className="mx-auto mb-12 max-w-xl text-center text-sm text-text-secondary">
-            50 ítems distribuidos en 4 bloques. Instrumentos validados internacionalmente.
-          </p>
+      {/* ===== INSTRUMENTS ===== */}
+      <section className="relative py-24 sm:py-32 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={staggerContainer}
+            className="text-center mb-16"
+          >
+            <motion.p variants={fadeIn} className="text-sm font-mono tracking-[0.3em] text-accent-primary uppercase mb-4">
+              Instrumentos
+            </motion.p>
+            <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary mb-6">
+              Bateria validada
+            </motion.h2>
+            <motion.p variants={fadeIn} className="max-w-xl mx-auto text-text-secondary text-lg">
+              50 items distribuidos en 4 bloques con instrumentos validados internacionalmente.
+            </motion.p>
+          </motion.div>
 
-          <div className="overflow-x-auto rounded-xl border border-border-subtle bg-bg-surface">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-border-subtle text-xs uppercase tracking-wider text-text-muted">
-                  <th className="px-5 py-3 font-mono font-medium">Bloque</th>
-                  <th className="px-5 py-3 font-medium">Instrumento</th>
-                  <th className="px-5 py-3 font-mono font-medium">Ítems</th>
-                  <th className="px-5 py-3 font-mono font-medium">Escala</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {INSTRUMENT.map((row) => (
-                  <tr key={row.bloque}>
-                    <td className="px-5 py-3 font-mono font-bold text-accent-primary">{row.bloque}</td>
-                    <td className="px-5 py-3 font-semibold text-text-primary">{row.instrumento}</td>
-                    <td className="px-5 py-3 font-mono text-text-secondary">{row.items}</td>
-                    <td className="px-5 py-3 font-mono text-text-secondary">{row.escala}</td>
-                  </tr>
-                ))}
-                <tr className="border-t border-border-default bg-bg-elevated/50">
-                  <td className="px-5 py-3 font-mono font-bold text-text-primary">Σ</td>
-                  <td className="px-5 py-3 font-semibold text-text-primary">Total</td>
-                  <td className="px-5 py-3 font-mono font-bold text-text-primary">50</td>
-                  <td className="px-5 py-3" />
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="rounded-2xl border border-border-subtle bg-bg-card overflow-hidden"
+          >
+            <div className="grid grid-cols-4 gap-px bg-border-subtle">
+              {['Bloque', 'Instrumento', 'Items', 'Escala'].map((header) => (
+                <div key={header} className="px-4 py-3 bg-bg-elevated text-xs font-mono uppercase tracking-wider text-text-muted">
+                  {header}
+                </div>
+              ))}
+              {INSTRUMENTS.map((inst) => (
+                <>
+                  <div key={`${inst.block}-block`} className="px-4 py-4 bg-bg-card font-mono font-bold text-accent-primary">
+                    {inst.block}
+                  </div>
+                  <div key={`${inst.block}-name`} className="px-4 py-4 bg-bg-card text-text-primary font-medium">
+                    {inst.name}
+                  </div>
+                  <div key={`${inst.block}-items`} className="px-4 py-4 bg-bg-card font-mono text-text-secondary">
+                    {inst.items}
+                  </div>
+                  <div key={`${inst.block}-scale`} className="px-4 py-4 bg-bg-card font-mono text-text-secondary">
+                    {inst.scale}
+                  </div>
+                </>
+              ))}
+              <div className="px-4 py-4 bg-bg-elevated font-mono font-bold text-text-primary">S</div>
+              <div className="px-4 py-4 bg-bg-elevated text-text-primary font-semibold">Total</div>
+              <div className="px-4 py-4 bg-bg-elevated font-mono font-bold text-accent-primary">50</div>
+              <div className="px-4 py-4 bg-bg-elevated" />
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ===== TRANSPARENCIA ===== */}
-      <section className="bg-bg-surface/50 px-4 py-20">
-        <div className="mx-auto max-w-2xl">
-          <div className="rounded-xl border border-border-subtle bg-bg-surface p-8">
-            <p className="mb-3 font-mono text-xs tracking-[0.2em] text-text-muted uppercase">TRANSPARENCIA</p>
-            <h2 className="mb-4 text-xl font-bold">Datos anónimos. Siempre.</h2>
-            <p className="text-sm leading-relaxed text-text-secondary">
-              Investigación académica sobre bienestar laboral en microempresas tecnológicas españolas,
-              desarrollada en la Universidad Nacional de Educación a Distancia (UNED).
-              Participación voluntaria, anónima y no remunerada.
-              Sin datos identificativos. Sin IP. Sin cookies. Los datos se utilizan
-              exclusivamente para análisis estadístico agregado con fines académicos.
+      {/* ===== TRANSPARENCY ===== */}
+      <section className="relative py-24 sm:py-32 px-4 bg-bg-surface/50">
+        <div className="max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="p-8 sm:p-10 rounded-2xl border border-border-subtle bg-bg-card"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-accent-subtle flex items-center justify-center">
+                <svg className="w-5 h-5 text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-xs font-mono tracking-[0.2em] text-accent-primary uppercase">Transparencia</p>
+                <h3 className="text-xl font-bold text-text-primary">Datos anonimos. Siempre.</h3>
+              </div>
+            </div>
+            <p className="text-text-secondary leading-relaxed mb-6">
+              Investigacion academica sobre bienestar laboral en microempresas tecnologicas espanolas, desarrollada en la Universidad Nacional de Educacion a Distancia (UNED). Participacion voluntaria, anonima y no remunerada.
             </p>
-            <p className="mt-4 font-mono text-xs text-text-muted">
-              ▶ Responsable: Raúl Balaguer Moreno · rbalaguer16@alumno.uned.es
-            </p>
-          </div>
+            <div className="pt-6 border-t border-border-subtle">
+              <p className="text-sm text-text-muted font-mono">
+                Responsable: Raul Balaguer Moreno
+              </p>
+              <p className="text-sm text-text-muted font-mono mt-1">
+                rbalaguer16@alumno.uned.es
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ===== CTA FINAL ===== */}
-      <section className="px-4 py-20 text-center">
-        <p className="mb-3 font-mono text-xs tracking-[0.2em] text-text-muted uppercase">⌖ DIAGNÓSTICO</p>
-        <h2 className="mb-6 text-2xl font-bold sm:text-3xl">
-          ¿Listo para calcular tu Re<sub>org</sub>?
-        </h2>
-        <Link
-          href="/consentimiento"
-          className="inline-flex items-center gap-2 rounded-xl bg-accent-primary px-8 py-4 text-lg font-semibold text-white transition-all duration-150 hover:bg-accent-hover focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+      {/* ===== FINAL CTA ===== */}
+      <section className="relative py-24 sm:py-32 px-4 overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_100%,#10B98110,transparent)]" />
+        
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="relative max-w-2xl mx-auto text-center"
         >
-          Iniciar diagnóstico →
-        </Link>
-        <p className="mt-6 font-mono text-xs text-text-muted">
-          UNED · Grado en Psicología · 2025–2026
-        </p>
+          <motion.p variants={fadeIn} className="text-sm font-mono tracking-[0.3em] text-accent-primary uppercase mb-6">
+            Diagnostico
+          </motion.p>
+          <motion.h2 variants={fadeIn} className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary mb-8">
+            Calcula tu Re<sub className="text-lg">org</sub>
+          </motion.h2>
+          <motion.div variants={fadeIn}>
+            <Link
+              href="/consentimiento"
+              className="group inline-flex items-center gap-3 px-10 py-5 rounded-xl bg-accent-primary text-bg-base font-semibold text-lg transition-all duration-300 hover:bg-accent-hover hover:shadow-[0_0_60px_#10B98130]"
+            >
+              Iniciar diagnostico
+              <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </motion.div>
+          <motion.p variants={fadeIn} className="mt-8 text-sm text-text-muted font-mono">
+            UNED · Grado en Psicologia · 2025-2026
+          </motion.p>
+        </motion.div>
       </section>
     </main>
   );
