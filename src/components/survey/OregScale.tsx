@@ -21,9 +21,9 @@ export default function OregScale({ value, onChange, disabled = false }: OregSca
   return (
     <div className="w-full space-y-3">
       {/* Labels above */}
-      <div className="flex justify-between px-0.5 text-[10px] leading-tight text-text-muted sm:text-xs">
-        <span>Totalmente en desacuerdo</span>
-        <span>Totalmente de acuerdo</span>
+      <div className="grid grid-cols-2 gap-2 px-0.5 text-[10px] leading-snug text-text-muted sm:text-xs">
+        <span className="max-w-[12ch] text-left [overflow-wrap:anywhere] sm:max-w-none">Totalmente en desacuerdo</span>
+        <span className="justify-self-end max-w-[12ch] text-right [overflow-wrap:anywhere] sm:max-w-none">Totalmente de acuerdo</span>
       </div>
 
       {/* Buttons row — full width, 6 buttons = more space per button */}
@@ -72,7 +72,7 @@ export default function OregScale({ value, onChange, disabled = false }: OregSca
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="text-center text-xs text-accent-primary font-medium h-4"
+            className="min-h-[1.75rem] px-1 text-center text-[11px] leading-snug text-accent-primary font-medium [overflow-wrap:anywhere]"
           >
             {VALUE_LABELS[value]}
           </motion.p>

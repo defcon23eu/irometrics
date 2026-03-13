@@ -450,9 +450,9 @@ export default function DiagnosticoPage() {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="rounded-2xl border border-border-subtle bg-bg-elevated/60 p-5 sm:p-8"
+              className="rounded-2xl border border-border-subtle bg-bg-elevated/60 p-4 sm:p-8"
             >
-              <h2 className="mb-6 text-center text-base font-semibold leading-relaxed sm:mb-8 sm:text-xl">
+              <h2 className="mb-6 px-1 text-center text-[15px] font-semibold leading-relaxed [overflow-wrap:anywhere] sm:mb-8 sm:px-0 sm:text-xl">
                 {question.text}
               </h2>
               {renderInput()}

@@ -73,7 +73,7 @@ export default function MBIScale({ value, onChange, disabled = false }: MBIScale
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="text-center text-xs text-accent-primary font-medium h-4"
+            className="min-h-[1.75rem] px-1 text-center text-[11px] leading-snug text-accent-primary font-medium [overflow-wrap:anywhere]"
           >
             {VALUE_LABELS[value]}
           </motion.p>
